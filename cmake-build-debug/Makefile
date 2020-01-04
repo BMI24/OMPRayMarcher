@@ -150,6 +150,33 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+ray_marcher.o: ray_marcher.cpp.o
+
+.PHONY : ray_marcher.o
+
+# target to build an object file
+ray_marcher.cpp.o:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/ray_marcher.cpp.o
+.PHONY : ray_marcher.cpp.o
+
+ray_marcher.i: ray_marcher.cpp.i
+
+.PHONY : ray_marcher.i
+
+# target to preprocess a source file
+ray_marcher.cpp.i:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/ray_marcher.cpp.i
+.PHONY : ray_marcher.cpp.i
+
+ray_marcher.s: ray_marcher.cpp.s
+
+.PHONY : ray_marcher.s
+
+# target to generate assembly for a file
+ray_marcher.cpp.s:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/ray_marcher.cpp.s
+.PHONY : ray_marcher.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +189,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... ray_marcher.o"
+	@echo "... ray_marcher.i"
+	@echo "... ray_marcher.s"
 .PHONY : help
 
 

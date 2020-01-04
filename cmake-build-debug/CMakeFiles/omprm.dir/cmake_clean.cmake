@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/omprm.dir/main.cpp.o"
+  "CMakeFiles/omprm.dir/ray_marcher.cpp.o"
   "libomprm.dll.a"
   "omprm.exe"
   "omprm.pdb"

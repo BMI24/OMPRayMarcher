@@ -6,7 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/cygdrive/c/Users/BMI24/CLionProjects/omprm/main.cpp
-iostream
+/cygdrive/c/Users/BMI24/CLionProjects/omprm/ray_marcher.cpp
+sys/param.h
+-
+cmath
+-
+vector
 -
 

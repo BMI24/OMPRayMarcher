@@ -80,7 +80,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/cygdrive/c/Users/BMI24/CLionProjects/omprm/bitmap_image.hpp">
+			<Option target="omprm"/>
+		</Unit>
 		<Unit filename="/cygdrive/c/Users/BMI24/CLionProjects/omprm/main.cpp">
+			<Option target="omprm"/>
+		</Unit>
+		<Unit filename="/cygdrive/c/Users/BMI24/CLionProjects/omprm/ray_marcher.cpp">
+			<Option target="omprm"/>
+		</Unit>
+		<Unit filename="/cygdrive/c/Users/BMI24/CLionProjects/omprm/ray_marcher.h">
 			<Option target="omprm"/>
 		</Unit>
 		<Unit filename="/cygdrive/c/Users/BMI24/CLionProjects/omprm/CMakeLists.txt">

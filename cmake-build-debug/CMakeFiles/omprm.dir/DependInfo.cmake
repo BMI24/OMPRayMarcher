@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/cygdrive/c/Users/BMI24/CLionProjects/omprm/main.cpp" "/cygdrive/c/Users/BMI24/CLionProjects/omprm/cmake-build-debug/CMakeFiles/omprm.dir/main.cpp.o"
+  "/cygdrive/c/Users/BMI24/CLionProjects/omprm/ray_marcher.cpp" "/cygdrive/c/Users/BMI24/CLionProjects/omprm/cmake-build-debug/CMakeFiles/omprm.dir/ray_marcher.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
