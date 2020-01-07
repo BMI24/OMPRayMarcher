@@ -6,11 +6,45 @@
 
 #IncludeRegexTransform: 
 
-/cygdrive/c/Users/BMI24/CLionProjects/omprm/ray_marcher.cpp
-sys/param.h
+/cygdrive/c/Users/Max/Desktop/omprm/bitmap_image.hpp
+algorithm
 -
 cmath
 -
+cstdlib
+-
+cstring
+-
+fstream
+-
+iostream
+-
+iterator
+-
+limits
+-
+string
+-
 vector
 -
+
+/cygdrive/c/Users/Max/Desktop/omprm/main.cpp
+iostream
+-
+cmath
+-
+string.h
+-
+ray_marcher.h
+/cygdrive/c/Users/Max/Desktop/omprm/ray_marcher.h
+bitmap_image.hpp
+/cygdrive/c/Users/Max/Desktop/omprm/bitmap_image.hpp
+sphere.cpp
+/cygdrive/c/Users/Max/Desktop/omprm/sphere.cpp
+
+/cygdrive/c/Users/Max/Desktop/omprm/ray_marcher.h
+sphere.cpp
+/cygdrive/c/Users/Max/Desktop/omprm/sphere.cpp
+
+/cygdrive/c/Users/Max/Desktop/omprm/sphere.cpp
 

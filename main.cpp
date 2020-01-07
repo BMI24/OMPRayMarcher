@@ -3,15 +3,22 @@
 #include <string.h>
 #include "ray_marcher.h"
 #include "bitmap_image.hpp"
+#include "sphere.cpp"
 
 int main() {
     const std::string file_name = "sphere.bmp";
+    constexpr int image_x_size = 500;
+    constexpr int image_y_size = 500;
+    sphere sphere_one(9, 6, 6, 2);
+    sphere sphere_two(6, -2, -1, 1.5);
+    std::vector<sphere> spheres = {sphere_one, sphere_two};
+    //x nach vorne(+)/hinten(-)
+    //y nach oben(-)/unten(+)
+    //z nach links(-)/rechts(+)
 
-    constexpr int image_x_size = 100;
-    constexpr int image_y_size = 100;
     std::vector<uint8_t> image(image_x_size * image_y_size * 3,0);
 
-    render(image_x_size, image_y_size, image.data());
+    render(image_x_size, image_y_size, image.data(), spheres.data(), spheres.size());
 
     bitmap_image image_file(image_x_size, image_y_size);
 

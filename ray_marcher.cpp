@@ -1,19 +1,23 @@
 #include <sys/param.h>
 #include <cmath>
 #include <vector>
+#include <cfloat>
+#include "sphere.cpp"
 
 inline void write_r(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
 inline void write_g(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
 inline void write_b(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
-inline float distance_to_sample_sphere(const float x, const float y, const float z);
-inline void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size, const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z, const float far_clip);
+inline float distance_to_sample_sphere(const float x, const float y, const float z, sphere sphere);
+inline void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
+        const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
+        const float far_clip, sphere* sphere_array, int sphere_array_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 
 //very small number
-constexpr float epsilon = 0.01;
+constexpr float epsilon = 0.001;
 
-void render(const int image_x_size, const int image_y_size, uint8_t* image)
+void render(const int image_x_size, const int image_y_size, uint8_t* image, sphere* sphere_array, int sphere_array_length)
 {
     const float image_x_fov = deg2rad(90);
     const float image_y_fov = deg2rad(90);
@@ -31,12 +35,15 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image)
         for (int x = 0; x < image_x_size; ++x) {
             float x_angle = camera_x_view_angle - (image_x_fov / 2) + (image_x_fov / image_x_size) * x;
             float y_angle = camera_y_view_angle - (image_y_fov / 2) + (image_y_fov / image_y_size) * y;
-            render_pixel(image, x, y, image_x_size, x_angle, y_angle, camera_x_pos, camera_y_pos, camera_z_pos, far_clip);
+            render_pixel(image, x, y, image_x_size, x_angle, y_angle, camera_x_pos, camera_y_pos, camera_z_pos,
+                    far_clip, sphere_array, sphere_array_length);
         }
     }
 }
 
-void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size, const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z, const float far_clip)
+void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
+        const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
+        const float far_clip, sphere* sphere_array, int sphere_array_length)
 {
     const float direction_x = cos(x_angle) * cos(y_angle);
     const float direction_z = sin(x_angle) * cos(y_angle);
@@ -44,17 +51,33 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     float x = camera_x;
     float y = camera_y;
     float z = camera_z;
-    float distance = distance_to_sample_sphere(x,y,z);
+    float smallest_distance = FLT_MAX;
 
-    while (distance > epsilon && distance_between(camera_x, camera_y, camera_z, x, y, z) < far_clip)
-    {
-         x += distance * direction_x;
-         y += distance * direction_y;
-         z += distance * direction_z;
+    for (int i = 0; i < sphere_array_length; ++i) {
+        float distance = distance_to_sample_sphere(x,y,z, sphere_array[i]);
 
-        distance =  distance_to_sample_sphere(x,y,z);
+        if(distance < smallest_distance){
+            smallest_distance = distance;
+        }
     }
-    if (distance > epsilon)
+
+    while (smallest_distance > epsilon && distance_between(camera_x, camera_y, camera_z, x, y, z) < far_clip)
+    {
+        x += smallest_distance * direction_x;
+        y += smallest_distance * direction_y;
+        z += smallest_distance * direction_z;
+
+        smallest_distance = FLT_MAX;
+
+        for (int i = 0; i < sphere_array_length; ++i) {
+            float distance = distance_to_sample_sphere(x,y,z, sphere_array[i]);
+
+            if(distance < smallest_distance){
+                smallest_distance = distance;
+            }
+        }
+    }
+    if (smallest_distance > epsilon)
     {
         //reached far clip, make pixel black
         write_r(image, image_x, image_y, x_size, 0);
@@ -89,13 +112,9 @@ inline void write_b(uint8_t* image, const int image_x, const int image_y, const 
     image[3*(image_y*x_size+image_x)+2] = value;
 }
 
-inline float distance_to_sample_sphere(float x, float y, float z) {
-    constexpr float origin_sphere_x = 3;
-    constexpr float origin_sphere_y = 0;
-    constexpr float origin_sphere_z = 0;
-    constexpr float sphere_radius = 1;
+inline float distance_to_sample_sphere(float x, float y, float z, sphere sphere) {
 
-    float distance = distance_between(origin_sphere_x, origin_sphere_y, origin_sphere_z, x, y, z) - sphere_radius;
+    float distance = distance_between(sphere.x, sphere.y, sphere.z, x, y, z) - sphere.radius;
 
     return distance;
 }

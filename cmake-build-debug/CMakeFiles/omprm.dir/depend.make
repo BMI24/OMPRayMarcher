@@ -4,6 +4,10 @@
 CMakeFiles/omprm.dir/main.cpp.o: ../bitmap_image.hpp
 CMakeFiles/omprm.dir/main.cpp.o: ../main.cpp
 CMakeFiles/omprm.dir/main.cpp.o: ../ray_marcher.h
+CMakeFiles/omprm.dir/main.cpp.o: ../sphere.cpp
 
 CMakeFiles/omprm.dir/ray_marcher.cpp.o: ../ray_marcher.cpp
+CMakeFiles/omprm.dir/ray_marcher.cpp.o: ../sphere.cpp
+
+CMakeFiles/omprm.dir/sphere.cpp.o: ../sphere.cpp
 
