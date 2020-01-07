@@ -4,7 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/cygdrive/c/Users/Max/Desktop/omprm/box.cpp" "/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir/box.cpp.o"
   "/cygdrive/c/Users/Max/Desktop/omprm/main.cpp" "/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir/main.cpp.o"
+  "/cygdrive/c/Users/Max/Desktop/omprm/object_interface.cpp" "/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir/object_interface.cpp.o"
   "/cygdrive/c/Users/Max/Desktop/omprm/ray_marcher.cpp" "/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir/ray_marcher.cpp.o"
   "/cygdrive/c/Users/Max/Desktop/omprm/sphere.cpp" "/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir/sphere.cpp.o"
   )

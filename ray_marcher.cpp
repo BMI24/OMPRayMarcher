@@ -2,22 +2,21 @@
 #include <cmath>
 #include <vector>
 #include <cfloat>
-#include "sphere.cpp"
+#include "object_interface.cpp"
 
 inline void write_r(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
 inline void write_g(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
 inline void write_b(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
-inline float distance_to_sample_sphere(const float x, const float y, const float z, sphere sphere);
 inline void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
         const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, sphere* sphere_array, int sphere_array_length);
+        const float far_clip, object_interface** object_array, int object_array_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 
 //very small number
 constexpr float epsilon = 0.001;
 
-void render(const int image_x_size, const int image_y_size, uint8_t* image, sphere* sphere_array, int sphere_array_length)
+void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** object_array, int object_array_length)
 {
     const float image_x_fov = deg2rad(90);
     const float image_y_fov = deg2rad(90);
@@ -36,14 +35,14 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, sphe
             float x_angle = camera_x_view_angle - (image_x_fov / 2) + (image_x_fov / image_x_size) * x;
             float y_angle = camera_y_view_angle - (image_y_fov / 2) + (image_y_fov / image_y_size) * y;
             render_pixel(image, x, y, image_x_size, x_angle, y_angle, camera_x_pos, camera_y_pos, camera_z_pos,
-                    far_clip, sphere_array, sphere_array_length);
+                    far_clip, object_array, object_array_length);
         }
     }
 }
 
 void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
         const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, sphere* sphere_array, int sphere_array_length)
+        const float far_clip, object_interface** object_array, int object_array_length)
 {
     const float direction_x = cos(x_angle) * cos(y_angle);
     const float direction_z = sin(x_angle) * cos(y_angle);
@@ -52,12 +51,14 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     float y = camera_y;
     float z = camera_z;
     float smallest_distance = FLT_MAX;
+    int nearest_sphere;
 
-    for (int i = 0; i < sphere_array_length; ++i) {
-        float distance = distance_to_sample_sphere(x,y,z, sphere_array[i]);
+    for (int i = 0; i < object_array_length; ++i) {
+        float distance = object_array[i]->distance_to_surface(x,y,z);
 
         if(distance < smallest_distance){
             smallest_distance = distance;
+            nearest_sphere = i;
         }
     }
 
@@ -69,14 +70,16 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
 
         smallest_distance = FLT_MAX;
 
-        for (int i = 0; i < sphere_array_length; ++i) {
-            float distance = distance_to_sample_sphere(x,y,z, sphere_array[i]);
+        for (int i = 0; i < object_array_length; ++i) {
+            float distance = object_array[i]->distance_to_surface(x,y,z);
 
             if(distance < smallest_distance){
                 smallest_distance = distance;
+                nearest_sphere = i;
             }
         }
     }
+
     if (smallest_distance > epsilon)
     {
         //reached far clip, make pixel black
@@ -87,13 +90,10 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     else
     {
         //hit object, make pixel the color of the object
-        constexpr uint8_t sphere_color_r = 255;
-        constexpr uint8_t sphere_color_g = 0;
-        constexpr uint8_t sphere_color_b = 0;
 
-        write_r(image, image_x, image_y, x_size, sphere_color_r);
-        write_g(image, image_x, image_y, x_size, sphere_color_g);
-        write_b(image, image_x, image_y, x_size, sphere_color_b);
+        write_r(image, image_x, image_y, x_size, object_array[nearest_sphere]->get_color_r());
+        write_g(image, image_x, image_y, x_size, object_array[nearest_sphere]->get_color_g());
+        write_b(image, image_x, image_y, x_size, object_array[nearest_sphere]->get_color_b());
     }
 }
 
@@ -110,13 +110,6 @@ inline void write_g(uint8_t* image, const int image_x, const int image_y, const 
 inline void write_b(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value)
 {
     image[3*(image_y*x_size+image_x)+2] = value;
-}
-
-inline float distance_to_sample_sphere(float x, float y, float z, sphere sphere) {
-
-    float distance = distance_between(sphere.x, sphere.y, sphere.z, x, y, z) - sphere.radius;
-
-    return distance;
 }
 
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2) {

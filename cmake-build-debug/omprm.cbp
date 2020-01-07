@@ -83,7 +83,13 @@
 		<Unit filename="/cygdrive/c/Users/Max/Desktop/omprm/bitmap_image.hpp">
 			<Option target="omprm"/>
 		</Unit>
+		<Unit filename="/cygdrive/c/Users/Max/Desktop/omprm/box.cpp">
+			<Option target="omprm"/>
+		</Unit>
 		<Unit filename="/cygdrive/c/Users/Max/Desktop/omprm/main.cpp">
+			<Option target="omprm"/>
+		</Unit>
+		<Unit filename="/cygdrive/c/Users/Max/Desktop/omprm/object_interface.cpp">
 			<Option target="omprm"/>
 		</Unit>
 		<Unit filename="/cygdrive/c/Users/Max/Desktop/omprm/ray_marcher.cpp">

@@ -1,5 +1,7 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/omprm.dir/box.cpp.o"
   "CMakeFiles/omprm.dir/main.cpp.o"
+  "CMakeFiles/omprm.dir/object_interface.cpp.o"
   "CMakeFiles/omprm.dir/ray_marcher.cpp.o"
   "CMakeFiles/omprm.dir/sphere.cpp.o"
   "libomprm.dll.a"

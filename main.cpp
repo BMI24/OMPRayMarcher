@@ -4,14 +4,17 @@
 #include "ray_marcher.h"
 #include "bitmap_image.hpp"
 #include "sphere.cpp"
+#include "box.cpp"
+#include "object_interface.cpp"
 
 int main() {
     const std::string file_name = "sphere.bmp";
     constexpr int image_x_size = 500;
     constexpr int image_y_size = 500;
-    sphere sphere_one(9, 6, 6, 2);
-    sphere sphere_two(6, -2, -1, 1.5);
-    std::vector<sphere> spheres = {sphere_one, sphere_two};
+    sphere sphere_one(9, 6, 6, 2, 255, 0, 0);
+    sphere sphere_two(6, -2, -1, 1.5, 0, 255, 0);
+    box box_one(7,2,-3,1,5000,5000,0,0,255);
+    std::vector<object_interface*> spheres = {&sphere_one, &sphere_two, &box_one};
     //x nach vorne(+)/hinten(-)
     //y nach oben(-)/unten(+)
     //z nach links(-)/rechts(+)

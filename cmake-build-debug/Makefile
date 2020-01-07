@@ -123,6 +123,33 @@ omprm/fast:
 	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/build
 .PHONY : omprm/fast
 
+box.o: box.cpp.o
+
+.PHONY : box.o
+
+# target to build an object file
+box.cpp.o:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/box.cpp.o
+.PHONY : box.cpp.o
+
+box.i: box.cpp.i
+
+.PHONY : box.i
+
+# target to preprocess a source file
+box.cpp.i:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/box.cpp.i
+.PHONY : box.cpp.i
+
+box.s: box.cpp.s
+
+.PHONY : box.s
+
+# target to generate assembly for a file
+box.cpp.s:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/box.cpp.s
+.PHONY : box.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -149,6 +176,33 @@ main.s: main.cpp.s
 main.cpp.s:
 	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+object_interface.o: object_interface.cpp.o
+
+.PHONY : object_interface.o
+
+# target to build an object file
+object_interface.cpp.o:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/object_interface.cpp.o
+.PHONY : object_interface.cpp.o
+
+object_interface.i: object_interface.cpp.i
+
+.PHONY : object_interface.i
+
+# target to preprocess a source file
+object_interface.cpp.i:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/object_interface.cpp.i
+.PHONY : object_interface.cpp.i
+
+object_interface.s: object_interface.cpp.s
+
+.PHONY : object_interface.s
+
+# target to generate assembly for a file
+object_interface.cpp.s:
+	$(MAKE) -f CMakeFiles/omprm.dir/build.make CMakeFiles/omprm.dir/object_interface.cpp.s
+.PHONY : object_interface.cpp.s
 
 ray_marcher.o: ray_marcher.cpp.o
 
@@ -213,9 +267,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... omprm"
 	@echo "... edit_cache"
+	@echo "... box.o"
+	@echo "... box.i"
+	@echo "... box.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... object_interface.o"
+	@echo "... object_interface.i"
+	@echo "... object_interface.s"
 	@echo "... ray_marcher.o"
 	@echo "... ray_marcher.i"
 	@echo "... ray_marcher.s"
