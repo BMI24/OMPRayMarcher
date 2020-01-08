@@ -19,22 +19,22 @@ public:
                 + length(std::fmax(x_distance, 0), std::fmax(y_distance,0), std::fmax(z_distance,0));
     }
 
-    float length(float x, float y, float z) {
+    static inline float length(float x1, float y1, float z1) {
         return sqrt(
-                pow(x, 2)
-                + pow(y, 2)
-                + pow(z, 2));
+                pow(x1, 2)
+                + pow(y1, 2)
+                + pow(z1, 2));
     }
 
-    uint8_t get_color_r(){
+    uint8_t get_color_r() override {
         return color_r;
     }
 
-    uint8_t get_color_g(){
+    uint8_t get_color_g() override {
         return color_g;
     }
 
-    uint8_t get_color_b(){
+    uint8_t get_color_b() override {
         return color_b;
     }
 
