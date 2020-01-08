@@ -1,3 +1,0 @@
-/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/omprm.dir
-/cygdrive/c/Users/Max/Desktop/omprm/cmake-build-debug/CMakeFiles/edit_cache.dir

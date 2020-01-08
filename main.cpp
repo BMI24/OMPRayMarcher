@@ -13,8 +13,8 @@ int main() {
     constexpr int image_y_size = 500;
     sphere sphere_one(9, 6, 6, 2, 255, 0, 0);
     sphere sphere_two(6, -2, -1, 1.5, 0, 255, 0);
-    box box_one(7,2,-3,1,5000,5000,0,0,255);
-    std::vector<object_interface*> spheres = {&sphere_one, &sphere_two, &box_one};
+    box box_one(7,2,-3,1,3,3,0,0,255);
+    std::vector<object_interface*> spheres = {&box_one, &sphere_one, &sphere_two};
     //x nach vorne(+)/hinten(-)
     //y nach oben(-)/unten(+)
     //z nach links(-)/rechts(+)

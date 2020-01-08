@@ -1,1 +1,0 @@
-C:/cygwin64/bin/c++.exe -g  -Wl,--enable-auto-import CMakeFiles/omprm.dir/main.cpp.o CMakeFiles/omprm.dir/ray_marcher.cpp.o CMakeFiles/omprm.dir/sphere.cpp.o CMakeFiles/omprm.dir/box.cpp.o CMakeFiles/omprm.dir/object_interface.cpp.o  -o omprm.exe -Wl,--out-implib,libomprm.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
