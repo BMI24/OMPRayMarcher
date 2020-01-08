@@ -10,10 +10,10 @@ private:
     uint8_t color_r, color_g, color_b;
 
 public:
-    float distance_to_surface(float x2, float y2, float z2) {
-        float x_distance = abs(x-x2) - x_length;
-        float y_distance = abs(y-y2) - y_length;
-        float z_distance = abs(z-z2) - z_length;
+    float distance_to_surface(float x2, float y2, float z2) override {
+        float x_distance = fabs(x-x2) - x_length;
+        float y_distance = fabs(y-y2) - y_length;
+        float z_distance = fabs(z-z2) - z_length;
 
         return std::fmin(std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.0)
                 + length(std::fmax(x_distance, 0), std::fmax(y_distance,0), std::fmax(z_distance,0));
