@@ -15,9 +15,8 @@ public:
         float y_distance = abs(y-y2) - y_length;
         float z_distance = abs(z-z2) - z_length;
 
-        return std::fmin(
-                std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.0)
-                + length(std::fmax(x, 0), std::fmax(y,0), std::fmax(z,0));
+        return std::fmin(std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.0)
+                + length(std::fmax(x_distance, 0), std::fmax(y_distance,0), std::fmax(z_distance,0));
     }
 
     float length(float x, float y, float z) {
