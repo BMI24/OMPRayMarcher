@@ -49,19 +49,20 @@ inline void write_g(uint8_t* image, const int image_x, const int image_y, const 
 inline void write_b(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
 inline void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
         const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, object_interface** objects, int objects_length);
+        const float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, vec3 position, int &nearest_object);
 vec3 estimate_normal(object_interface *const *objects, int objects_length, vec3 position);
 vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha,
                         vec3 position, vec3 camera_position, object_interface *const *objects, int objects_length,
-                        int nearest_object_index);
+                        int nearest_object_index, light *const *lights, int lights_length);
 
 //very small number
 constexpr float epsilon = 0.0001;
 
-void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** objects, int objects_length)
+void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** objects,
+        int objects_length, light** lights, int lights_length)
 {
     const float image_x_fov = deg2rad(90);
     const float image_y_fov = deg2rad(90);
@@ -80,14 +81,14 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, obje
             float x_angle = camera_x_view_angle - (image_x_fov / 2) + (image_x_fov / image_x_size) * x;
             float y_angle = camera_y_view_angle - (image_y_fov / 2) + (image_y_fov / image_y_size) * y;
             render_pixel(image, x, y, image_x_size, x_angle, y_angle, camera_x_pos, camera_y_pos, camera_z_pos,
-                    far_clip, objects, objects_length);
+                    far_clip, objects, objects_length, lights, lights_length);
         }
     }
 }
 
 void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
         const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, object_interface** objects, int objects_length)
+        const float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length)
 {
     const vec3 ambient_color = vec3(0.2,0.2,0.2);
     const vec3 diffuse_color = vec3(.4,.4,.4);
@@ -119,7 +120,8 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     {
         //hit object, make pixel the color of the object
         vec3 light = phong_illumination(ambient_color, diffuse_color, specular_color, 5, position,
-                vec3(camera_x, camera_y, camera_z), objects, objects_length, nearest_object);
+                vec3(camera_x, camera_y, camera_z), objects, objects_length, nearest_object,
+                lights, lights_length);
         vec3 color = vec3(objects[nearest_object]->get_color_r(), objects[nearest_object]->get_color_g(),
                 objects[nearest_object]->get_color_b());
         color = color / 255.f;
@@ -275,16 +277,12 @@ bool light_visible(object_interface *const *objects, int objects_length, const v
 }
 
 vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
-                        vec3 camera_position, object_interface *const *objects, int objects_length, int hit_object_index) {
+                        vec3 camera_position, object_interface *const *objects, int objects_length,
+                        int hit_object_index, light *const *lights, int lights_length) {
     const vec3 ambient_light = vec3(1, 1, 1) * 0.5f;
     vec3 color = ambient_light * ambient_color;
-    light light_one(3, 3, 3, .7, .7, .7);
-    light light_two(2, -10, -4, 0.9, 0.9, 0.9);
-    std::vector<light*> lights = {&light_one, &light_two};
-    int lights_count = lights.size();
 
-    for (int i = 0; i < lights_count; ++i) {
-
+    for (int i = 0; i < lights_length; ++i) {
         if (!light_visible(objects,objects_length, vec3(lights[i]->x, lights[i]->y, lights[i]->z), position,
                 hit_object_index))
             continue;
