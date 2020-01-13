@@ -1,6 +1,4 @@
 #include <iostream>
-#include <cmath>
-#include <string.h>
 #include "ray_marcher.h"
 #include "bitmap_image.hpp"
 #include "sphere.cpp"
@@ -11,10 +9,10 @@ int main() {
     const std::string file_name = "raymarch.bmp";
     constexpr int image_x_size = 500;
     constexpr int image_y_size = 500;
-    sphere sphere_one(9, 6, 6, 2, 255, 0, 0);
+    sphere sphere_one(9, 5, 5, 2, 255, 0, 0);
     sphere sphere_two(6, -2, -1, 1.5, 0, 255, 0);
     box box_one(7,2,-3,1,2,2,0,0,255);
-    box box_two(8,2,-2,1,2.5,1.25,100,0,255);
+    box box_two(8,-4,3,1,2.5,1.25,100,0,255);
     std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two};
     //x nach vorne(+)/hinten(-)
     //y nach oben(-)/unten(+)
