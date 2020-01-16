@@ -5,6 +5,7 @@
 #include "object_interface.cpp"
 #include "light.cpp"
 
+
 struct vec3
 {
     float x;
@@ -15,7 +16,7 @@ struct vec3
         return vec3(x+b.x, y+b.y, z+b.z);
     }
 
-    inline const vec3 operator-(const vec3 b) const {
+    inline vec3 operator-(const vec3 b) const {
         return vec3(x-b.x, y-b.y, z-b.z);
     }
 
@@ -30,7 +31,7 @@ struct vec3
         return vec3(x*b.x, y*b.y, z*b.z);
     }
 
-    inline vec3 operator=(const vec3 b) {
+    inline vec3& operator=(const vec3 b) {
         x = b.x;
         y = b.y;
         z = b.z;
@@ -44,19 +45,97 @@ struct vec3
     }
 };
 
-inline void write_r(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
-inline void write_g(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
-inline void write_b(uint8_t* image, const int image_x, const int image_y, const int x_size, const uint8_t value);
-inline void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
+struct mat4x4
+{
+    float* matrix;
+
+    mat4x4()
+    {
+        matrix = new float[16]();
+    }
+
+    ~mat4x4()
+    {
+        delete matrix;
+    }
+
+    inline mat4x4 operator*(const mat4x4& b) const {
+        mat4x4 result;
+        for(int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                for (int k = 0; k < 4; ++k) {
+                    result.matrix[i * 4 + j] += matrix[i * 4 + k] * b.matrix[k * 4 + j];
+                }
+            }
+        }
+        return result;
+    }
+
+    inline vec3 operator*(const vec3 b) const{
+        constexpr float b4 = 1;
+        return vec3(
+                b.x*matrix[0]+b.y*matrix[1]+b.z*matrix[2]+b4*matrix[3],
+                b.x*matrix[4]+b.y*matrix[5]+b.z*matrix[6]+b4*matrix[7],
+                b.x*matrix[8]+b.y*matrix[9]+b.z*matrix[10]+b4*matrix[11]);
+    }
+};
+
+mat4x4 generate_mat_scale(vec3 scale)
+{
+    mat4x4 scale_mat;
+    scale_mat.matrix[0] = scale.x;
+    scale_mat.matrix[5] = scale.y;
+    scale_mat.matrix[10] = scale.z;
+    scale_mat.matrix[15] = 1;
+    return scale_mat;
+}
+
+mat4x4 generate_mat_rot_x(float angle)
+{
+    mat4x4 rot_mat;
+    rot_mat.matrix[0] = 1;
+    rot_mat.matrix[5] = cosf(angle);
+    rot_mat.matrix[6] = -sinf(angle);
+    rot_mat.matrix[9] = sinf(angle);
+    rot_mat.matrix[10] = cosf(angle);
+    return rot_mat;
+}
+
+mat4x4 generate_mat_rot_y(float angle)
+{
+    mat4x4 rot_mat;
+    rot_mat.matrix[0] = cosf(angle);
+    rot_mat.matrix[2] = sinf(angle);
+    rot_mat.matrix[5] = 1;
+    rot_mat.matrix[8] = -sinf(angle);
+    rot_mat.matrix[10] = cosf(angle);
+    return rot_mat;
+}
+
+mat4x4 generate_mat_rot_z(float angle)
+{
+    mat4x4 rot_mat;
+    rot_mat.matrix[0] = cosf(angle);
+    rot_mat.matrix[1] = -sinf(angle);
+    rot_mat.matrix[4] = sinf(angle);
+    rot_mat.matrix[5] = cosf(angle);
+    rot_mat.matrix[10] = 1;
+    return rot_mat;
+}
+
+inline void write_r(uint8_t* image, int image_x, const int image_y, const int x_size, const uint8_t value);
+inline void write_g(uint8_t* image, int image_x, const int image_y, const int x_size, const uint8_t value);
+inline void write_b(uint8_t* image, int image_x, const int image_y, const int x_size, const uint8_t value);
+inline void render_pixel(uint8_t* image, int image_x, const int image_y, const int x_size,
         const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length);
+        float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, vec3 position, int &nearest_object);
 vec3 estimate_normal(object_interface *const *objects, int objects_length, vec3 position);
-vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha,
-                        vec3 position, vec3 camera_position, object_interface *const *objects, int objects_length,
-                        int nearest_object_index, light *const *lights, int lights_length);
+vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
+                        vec3 camera_position, object_interface *const *objects, int objects_length,
+                        int hit_object_index, light *const *lights, int lights_length);
 
 //very small number
 constexpr float epsilon = 0.0001;
@@ -64,8 +143,8 @@ constexpr float epsilon = 0.0001;
 void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** objects,
         int objects_length, light** lights, int lights_length)
 {
-    const float image_x_fov = deg2rad(90);
-    const float image_y_fov = deg2rad(90);
+    const float image_x_fov = deg2rad(40);
+    const float image_y_fov = deg2rad(40);
 
     constexpr float far_clip = 1000;
 
@@ -93,9 +172,9 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     const vec3 ambient_color = vec3(0.2,0.2,0.2);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
-    const float direction_x = cos(x_angle) * cos(y_angle);
-    const float direction_z = sin(x_angle) * cos(y_angle);
-    const float direction_y = sin(y_angle);
+    const float direction_x = cosf(x_angle) * cosf(y_angle);
+    const float direction_z = sinf(x_angle) * cosf(y_angle);
+    const float direction_y = sinf(y_angle);
     const vec3 direction = vec3(direction_x, direction_y, direction_z);
     vec3 position = vec3(camera_x,camera_y,camera_z);
 
@@ -135,7 +214,7 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
 
 float length(vec3 input)
 {
-    return sqrt(pow(input.x,2)+pow(input.y,2)+pow(input.z,2));
+    return sqrtf(powf(input.x,2)+powf(input.y,2)+powf(input.z,2));
 }
 
 vec3 normalize(vec3 input)
@@ -160,14 +239,14 @@ inline void write_b(uint8_t* image, const int image_x, const int image_y, const 
 }
 
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2) {
-    return sqrt(
+    return sqrtf(
             pow(x1 - x2, 2)
             + pow(y1 - y2, 2)
             + pow(z1 - z2, 2));
 }
 
 inline float deg2rad(float degrees) {
-    static const double pi_on_180 = 4.0 * atan (1.0) / 180.0;
+    static const double pi_on_180 = 4.0 * atanf(1.0) / 180.0;
     return degrees * pi_on_180;
 }
 
