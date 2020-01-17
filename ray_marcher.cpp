@@ -55,7 +55,7 @@ struct mat4x4
 
     ~mat4x4()
     {
-        delete matrix;
+        delete[] matrix;
     }
 
     inline mat4x4 operator*(const mat4x4& b) const {
@@ -211,7 +211,7 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     }
 }
 
-float length(vec3 input)
+float length(const vec3 input)
 {
     return sqrtf(powf(input.x,2)+powf(input.y,2)+powf(input.z,2));
 }
