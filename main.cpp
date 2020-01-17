@@ -5,6 +5,7 @@
 #include "box.cpp"
 #include "object_interface.cpp"
 #include "light.cpp"
+#include <chrono>
 
 int main() {
     const std::string file_name = "raymarch.bmp";
@@ -23,9 +24,9 @@ int main() {
     //z nach links(-)/rechts(+)
 
     std::vector<uint8_t> image(image_x_size * image_y_size * 3,0);
-
+    auto start = std::chrono::steady_clock::now();
     render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size());
-
+    auto end = std::chrono::steady_clock::now();
     bitmap_image image_file(image_x_size, image_y_size);
 
     for (int y = 0; y < image_y_size; ++y) {
@@ -39,7 +40,8 @@ int main() {
 
     image_file.save_image(file_name);
 
-    std::cout << "Wrote image to " << file_name << std::endl;
+    std::cout << "Wrote image to " << file_name
+        << ", took " << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << " ms." << std::endl;
 
     return 0;
 }
