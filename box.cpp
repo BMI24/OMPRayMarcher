@@ -11,19 +11,19 @@ private:
 
 public:
     float distance_to_surface(float x2, float y2, float z2) override {
-        float x_distance = fabs(x-x2) - x_length;
-        float y_distance = fabs(y-y2) - y_length;
-        float z_distance = fabs(z-z2) - z_length;
+        float x_distance = fabsf(x-x2) - x_length;
+        float y_distance = fabsf(y-y2) - y_length;
+        float z_distance = fabsf(z-z2) - z_length;
 
-        return std::fmin(std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.0)
-                + length(std::fmax(x_distance, 0), std::fmax(y_distance,0), std::fmax(z_distance,0));
+        return std::fmin(std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.f)
+                + length(std::fmax(x_distance, 0.f), std::fmax(y_distance,0.f), std::fmax(z_distance,0.f));
     }
 
     static inline float length(float x1, float y1, float z1) {
-        return sqrt(
-                pow(x1, 2)
-                + pow(y1, 2)
-                + pow(z1, 2));
+        return sqrtf(
+                powf(x1, 2)
+                + powf(y1, 2)
+                + powf(z1, 2));
     }
 
     uint8_t get_color_r() override {
