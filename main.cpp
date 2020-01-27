@@ -11,21 +11,22 @@ int main() {
     const std::string file_name = "raymarch.bmp";
     constexpr int image_x_size = 500;
     constexpr int image_y_size = 500;
-    sphere sphere_one(9, 5, 5, 2, 255, 0, 0);
-    sphere sphere_two(6, -2, -1, 1.5, 0, 255, 0);
-    box box_one(7,2,-3,1,2,2,0,0,255);
-    box box_two(8,-4,3,1,2.5,1.25,100,0,255);
+    sphere sphere_one(9, -5, 5, 2, 255, 0, 0);
+    sphere sphere_two(6, 2, -1, 1.5, 0, 255, 0);
+    box box_one(7,-2,-3,1,2,2,0,0,255);
+    box box_two(8,4,3,1,2.5,1.25,100,0,255);
     std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two};
-    light light_one(3, 3, 3, .7, .7, .7);
-    light light_two(2, -10, -4, 0.9, 0.9, 0.9);
+    light light_one(3, -3, 3, .7, .7, .7);
+    light light_two(2, 10, -4, 0.9, 0.9, 0.9);
     std::vector<light*> lights = {&light_one, &light_two};
     //x nach vorne(+)/hinten(-)
-    //y nach oben(-)/unten(+)
+    //y nach oben(+)/unten(-)
     //z nach links(-)/rechts(+)
 
     std::vector<uint8_t> image(image_x_size * image_y_size * 3,0);
     auto start = std::chrono::steady_clock::now();
-    render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size());
+        render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size(),
+                0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 20);
     auto end = std::chrono::steady_clock::now();
     bitmap_image image_file(image_x_size, image_y_size);
 

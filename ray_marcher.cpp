@@ -62,6 +62,7 @@ struct mat4x4
         mat4x4 result;
         for(int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
+                result.matrix[i * 4 + j] = 0;
                 for (int k = 0; k < 4; ++k) {
                     result.matrix[i * 4 + j] += matrix[i * 4 + k] * b.matrix[k * 4 + j];
                 }
@@ -70,7 +71,7 @@ struct mat4x4
         return result;
     }
 
-    inline vec3 operator*(const vec3 b) const{
+    inline vec3 operator*(const vec3& b) const{
         constexpr float b4 = 1;
         return vec3(
                 b.x*matrix[0]+b.y*matrix[1]+b.z*matrix[2]+b4*matrix[3],
@@ -79,12 +80,26 @@ struct mat4x4
     }
 };
 
-mat4x4 generate_mat_scale(vec3 scale)
+mat4x4 generate_mat_transl(float translation_x, float translation_y, float translation_z)
 {
     mat4x4 scale_mat;
-    scale_mat.matrix[0] = scale.x;
-    scale_mat.matrix[5] = scale.y;
-    scale_mat.matrix[10] = scale.z;
+    scale_mat.matrix[0] = 1;
+    scale_mat.matrix[3] = translation_x;
+    scale_mat.matrix[5] = 1;
+    scale_mat.matrix[7] = translation_y;
+    scale_mat.matrix[10] = 1;
+    scale_mat.matrix[11] = translation_z;
+    scale_mat.matrix[15] = 1;
+
+    return scale_mat;
+}
+
+mat4x4 generate_mat_scale(float scale_x, float scale_y, float scale_z)
+{
+    mat4x4 scale_mat;
+    scale_mat.matrix[0] = scale_x;
+    scale_mat.matrix[5] = scale_y;
+    scale_mat.matrix[10] = scale_z;
     scale_mat.matrix[15] = 1;
     return scale_mat;
 }
@@ -97,6 +112,7 @@ mat4x4 generate_mat_rot_x(float angle)
     rot_mat.matrix[6] = -sinf(angle);
     rot_mat.matrix[9] = sinf(angle);
     rot_mat.matrix[10] = cosf(angle);
+    rot_mat.matrix[15] = 1;
     return rot_mat;
 }
 
@@ -108,6 +124,7 @@ mat4x4 generate_mat_rot_y(float angle)
     rot_mat.matrix[5] = 1;
     rot_mat.matrix[8] = -sinf(angle);
     rot_mat.matrix[10] = cosf(angle);
+    rot_mat.matrix[15] = 1;
     return rot_mat;
 }
 
@@ -119,6 +136,7 @@ mat4x4 generate_mat_rot_z(float angle)
     rot_mat.matrix[4] = sinf(angle);
     rot_mat.matrix[5] = cosf(angle);
     rot_mat.matrix[10] = 1;
+    rot_mat.matrix[15] = 1;
     return rot_mat;
 }
 
@@ -126,8 +144,8 @@ inline void write_r(uint8_t* image, int image_x, int image_y, int x_size, uint8_
 inline void write_g(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline void write_b(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
-        float x_angle, float y_angle, float camera_x, float camera_y, float camera_z,
-        float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length);
+        vec3 direction, float camera_x, float camera_y, float camera_z, float far_clip,
+        object_interface** objects, int objects_length, light** lights, int lights_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, vec3 position, int &nearest_object);
@@ -135,46 +153,47 @@ vec3 estimate_normal(object_interface *const *objects, int objects_length, vec3 
 vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
                         vec3 camera_position, object_interface *const *objects, int objects_length,
                         int hit_object_index, light *const *lights, int lights_length);
+vec3 normalize(vec3 input);
 
 //very small number
 constexpr float epsilon = 0.0001;
 
 void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** objects,
-        int objects_length, light** lights, int lights_length)
+        int objects_length, light** lights, int lights_length, float camera_x_pos, float camera_y_pos,
+        float camera_z_pos, float rot_x, float rot_y, float rot_z, float scale_x, float scale_y,
+        float scale_z, float fov, float far_clip)
 {
-    const float image_x_fov = deg2rad(40);
-    const float image_y_fov = deg2rad(40);
+    rot_x = deg2rad(rot_x);
+    rot_y = deg2rad(rot_y);
+    rot_z = deg2rad(rot_z);
 
-    constexpr float far_clip = 1000;
+    mat4x4 camera_to_world = generate_mat_transl(camera_x_pos, camera_y_pos, camera_z_pos) *
+            generate_mat_scale(scale_x, scale_y, scale_z) *
+            generate_mat_rot_x(rot_x) * generate_mat_rot_y(rot_y) * generate_mat_rot_z(rot_z);
 
-    constexpr float camera_x_pos = 0;
-    constexpr float camera_y_pos = 0;
-    constexpr float camera_z_pos = 0;
+    float aspect_ratio = (float)image_x_size / (float) image_y_size;
+    float fov_scale = tanf(deg2rad(fov * .5f));
+    vec3 origin = camera_to_world * vec3(0,0,0);
 
-    const float camera_x_view_angle = deg2rad(0);
-    const float camera_y_view_angle = deg2rad(0);
-
-    for (int y = 0; y < image_y_size; ++y) {
-        for (int x = 0; x < image_x_size; ++x) {
-            float x_angle = camera_x_view_angle - (image_x_fov / 2) + (image_x_fov / (float)image_x_size) * (float)x;
-            float y_angle = camera_y_view_angle - (image_y_fov / 2) + (image_y_fov / (float)image_y_size) * (float)y;
-            render_pixel(image, x, y, image_x_size, x_angle, y_angle, camera_x_pos, camera_y_pos, camera_z_pos,
+    for (int j = 0; j < image_y_size; ++j) {
+        for (int i = 0; i < image_x_size; ++i) {
+            float x = (2 * ((float)i+.5f)/ (float)image_x_size - 1.f) * aspect_ratio * fov_scale;
+            float y = (1 - 2 * ((float)j+.5f) / (float)image_y_size) * fov_scale;
+            vec3 dir = camera_to_world * vec3(x,y,-1);
+            dir = normalize(dir);
+            render_pixel(image, i, j, image_x_size, dir, camera_x_pos, camera_y_pos, camera_z_pos,
                     far_clip, objects, objects_length, lights, lights_length);
         }
     }
 }
 
 void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
-        const float x_angle, const float y_angle, const float camera_x, const float camera_y, const float camera_z,
-        const float far_clip, object_interface** objects, int objects_length, light** lights, int lights_length)
+        const vec3 direction, const float camera_x, const float camera_y, const float camera_z, const float far_clip,
+        object_interface** objects, int objects_length, light** lights, int lights_length)
 {
     const vec3 ambient_color = vec3(0.2,0.2,0.2);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
-    const float direction_x = cosf(x_angle) * cosf(y_angle);
-    const float direction_z = sinf(x_angle) * cosf(y_angle);
-    const float direction_y = sinf(y_angle);
-    const vec3 direction = vec3(direction_x, direction_y, direction_z);
     vec3 position = vec3(camera_x,camera_y,camera_z);
 
     int nearest_object;
