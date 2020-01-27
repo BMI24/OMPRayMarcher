@@ -1,10 +1,10 @@
 #include <iostream>
 #include "ray_marcher.h"
 #include "bitmap_image.hpp"
-#include "sphere.cpp"
-#include "box.cpp"
-#include "object_interface.cpp"
-#include "light.cpp"
+#include "sphere.h"
+#include "box.h"
+#include "object_interface.hpp"
+#include "light.h"
 #include <chrono>
 
 int main() {

@@ -1,8 +1,8 @@
 #include <cmath>
 #include <vector>
 #include <cfloat>
-#include "object_interface.cpp"
-#include "light.cpp"
+#include "object_interface.hpp"
+#include "light.h"
 
 
 struct vec3
