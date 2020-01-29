@@ -310,8 +310,9 @@ float clamp(float n, float lower, float upper){
  * @param light_intensity: color/intensity of the light
  * @return
  */
-vec3 phong_contrib_for_light(vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
-        vec3 camera_position, vec3 light_pos, vec3 light_intensity, object_interface *const *objects, int objects_length){
+vec3 phong_contrib_for_light(const vec3& diffuse_color, const vec3& specular_color, float alpha, const vec3& position,
+        const vec3& camera_position, const vec3& light_pos, const vec3& light_intensity,
+        object_interface *const *objects, int objects_length){
     vec3 normal = estimate_normal(objects, objects_length, position);
     vec3 object_light_direction = normalize(light_pos - position);
     vec3 camera_object_direction = normalize(camera_position - position);
@@ -331,7 +332,8 @@ vec3 phong_contrib_for_light(vec3 diffuse_color, vec3 specular_color, float alph
     return light_intensity * (diffuse_color * dot_o_n + specular_color * powf(dot_r_c, alpha));
 }
 
-float scene_sdf_ignore(object_interface *const *objects, int objects_length, const vec3& position, int ignore_object_index)
+float scene_sdf_ignore(object_interface *const *objects, int objects_length, const vec3& position,
+        int ignore_object_index)
 {
     float smallest_distance = FLT_MAX;
     for (int i = 0; i < objects_length; ++i) {
