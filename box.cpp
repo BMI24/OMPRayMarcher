@@ -18,27 +18,16 @@ float box::distance_to_surface(float x2, float y2, float z2) {
 }
 
 
-uint8_t box::get_color_r() {
-    return color_r;
+uint32_t box::get_color() {
+    return color;
 }
 
-uint8_t box::get_color_g() {
-    return color_g;
-}
-
-uint8_t box::get_color_b() {
-    return color_b;
-}
-
-box::box(float x, float y, float z, float x_length, float y_length, float z_length,
-         uint8_t color_r, uint8_t color_g, uint8_t color_b){
+box::box(float x, float y, float z, float x_length, float y_length, float z_length, uint32_t color){
     this->x = x;
     this->y = y;
     this->z = z;
     this->x_length = x_length;
     this->y_length = y_length;
     this->z_length = z_length;
-    this->color_r = color_r;
-    this->color_g = color_g;
-    this->color_b = color_b;
+    this->color = color;
 }

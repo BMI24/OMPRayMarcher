@@ -213,8 +213,8 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
         vec3 light = phong_illumination(ambient_color, diffuse_color, specular_color, 5, position,
                 vec3(camera_x, camera_y, camera_z), objects, objects_length, nearest_object,
                 lights, lights_length);
-        vec3 color = vec3(objects[nearest_object]->get_color_r(), objects[nearest_object]->get_color_g(),
-                objects[nearest_object]->get_color_b());
+        uint32_t packed_color = objects[nearest_object]->get_color();
+        vec3 color = vec3(packed_color >> 24u, float((packed_color >> 16u)&0xffu), float((packed_color>>8u)&0xffu));
         color = color / 255.f;
         vec3 lit_color = color * light;
 

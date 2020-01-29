@@ -11,10 +11,10 @@ int main() {
     const std::string file_name = "raymarch.bmp";
     constexpr int image_x_size = 500;
     constexpr int image_y_size = 500;
-    sphere sphere_one(9, -5, 5, 2, 255, 0, 0);
-    sphere sphere_two(6, 2, -1, 1.5, 0, 255, 0);
-    box box_one(7,-2,-3,1,2,2,0,0,255);
-    box box_two(8,4,3,1,2.5,1.25,100,0,255);
+    sphere sphere_one(9, -5, 5, 2, 0xFF000000);
+    sphere sphere_two(6, 2, -1, 1.5, 0x00FF0000);
+    box box_one(7,-2,-3,1,2,2, 0x0000FF00);
+    box box_two(8,4,3,1,2.5,1.25, 0x6400FF00);
     std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two};
     light light_one(3, -3, 3, .7, .7, .7);
     light light_two(2, 10, -4, 0.9, 0.9, 0.9);

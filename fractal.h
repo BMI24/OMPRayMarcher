@@ -12,13 +12,11 @@ class fractal : public object_interface {
 private:
     int iter;
     float x, y, z, scale;
-    uint8_t color_r, color_g, color_b;
+    uint32_t color;
 public:
-    fractal(float x, float y, float z, int iter, float scale, uint8_t color_r, uint8_t color_g, uint8_t color_b);
+    fractal(float x, float y, float z, int iter, float scale, uint32_t color);
     float distance_to_surface(float x, float y, float z) override;
-    uint8_t get_color_r() override;
-    uint8_t get_color_g() override;
-    uint8_t get_color_b() override;
+    uint32_t get_color() override;
 };
 
 
