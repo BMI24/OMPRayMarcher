@@ -168,6 +168,7 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, obje
     float fov_scale = tanf(deg2rad(fov * .5f));
     vec3 origin = camera_to_world * vec3(0,0,0);
 
+#pragma omp parallel for collapse(2) default(none) shared(image_y_size, image_x_size, aspect_ratio, fov_scale, camera_to_world, image, camera_x_pos, camera_y_pos, camera_z_pos, far_clip, objects, objects_length, lights, lights_length)
     for (int j = 0; j < image_y_size; ++j) {
         for (int i = 0; i < image_x_size; ++i) {
             float x = (2 * ((float)i+.5f)/ (float)image_x_size - 1.f) * aspect_ratio * fov_scale;
