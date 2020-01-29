@@ -42,16 +42,16 @@ inline float length(const vec3& input)
     return sqrtf(powf(input.x,2.f)+powf(input.y,2.f)+powf(input.z,2.f));
 }
 
-fractal::fractal(float x, float y, float z, int iter, float scale)
+fractal::fractal(float x, float y, float z, int iter, float scale, uint8_t color_r, uint8_t color_g, uint8_t color_b)
 {
     fractal::x = x;
     fractal::y = y;
     fractal::z = z;
     fractal::iter = iter;
     fractal::scale = scale;
-    color_r = 255;
-    color_g = 255;
-    color_b = 255;
+    fractal::color_r = color_r;
+    fractal::color_g = color_g;
+    fractal::color_b = color_b;
 }
 
 float fractal::distance_to_surface(float px, float py, float pz) {
@@ -93,8 +93,6 @@ float fractal::distance_to_surface(float px, float py, float pz) {
 
     return length(p) * powf(scale, float(-iter));
 }
-
-
 
 uint8_t fractal::get_color_r()  {
     return color_r;
