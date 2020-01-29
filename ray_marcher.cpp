@@ -179,7 +179,7 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, obje
         for (int i = 0; i < image_x_size; ++i) {
             float x = (2 * ((float)i+.5f)/ (float)image_x_size - 1.f) * aspect_ratio * fov_scale;
             float y = (1 - 2 * ((float)j+.5f) / (float)image_y_size) * fov_scale;
-            vec3 dir = camera_to_world * vec3(x,y,-1);
+            vec3 dir = camera_to_world * vec3(x,y,-1) - origin;
             dir = normalize(dir);
             render_pixel(image, i, j, image_x_size, dir, camera_x_pos, camera_y_pos, camera_z_pos,
                     far_clip, objects, objects_length, lights, lights_length);
