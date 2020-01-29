@@ -14,7 +14,7 @@ float sphere::distance_to_surface(float x2, float y2, float z2) {
     return distance;
 }
 
-uint32_t sphere::get_color()  {
+uint32_t sphere::get_color(float, float, float)  {
     return color;
 }
 

@@ -16,7 +16,7 @@ private:
 public:
     fractal(float x, float y, float z, int iter, float scale, uint32_t color);
     float distance_to_surface(float x, float y, float z) override;
-    uint32_t get_color() override;
+    uint32_t get_color(float x2, float y2, float z2) override;
 };
 
 

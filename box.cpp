@@ -18,7 +18,7 @@ float box::distance_to_surface(float x2, float y2, float z2) {
 }
 
 
-uint32_t box::get_color() {
+uint32_t box::get_color(float, float, float) {
     return color;
 }
 

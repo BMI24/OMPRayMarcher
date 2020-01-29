@@ -6,7 +6,7 @@
 class object_interface{
 public:
     virtual float distance_to_surface(float x, float y, float z) = 0;
-    virtual uint32_t get_color() = 0;
+    virtual uint32_t get_color(float x, float y, float z) = 0;
 };
 
 #endif

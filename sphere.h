@@ -15,7 +15,7 @@ private:
 public:
     float distance_to_surface(float x2, float y2, float z2) override;
 
-    uint32_t get_color() override;
+    uint32_t get_color(float x2, float y2, float z2) override;
 
     sphere(float x, float y, float z, float radius, uint32_t color);
 };

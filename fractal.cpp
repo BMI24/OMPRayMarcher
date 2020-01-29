@@ -92,6 +92,6 @@ float fractal::distance_to_surface(float px, float py, float pz) {
     return length(p) * powf(scale, float(-iter));
 }
 
-uint32_t fractal::get_color()  {
+uint32_t fractal::get_color(float, float, float)  {
     return color;
 }
