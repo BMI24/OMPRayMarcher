@@ -11,30 +11,23 @@ struct vec3
     float y;
     float z;
 
-    inline vec3 operator+(const vec3 b) const {
-        return vec3(x+b.x, y+b.y, z+b.z);
+    inline vec3 operator+(const vec3& b) const {
+        return {x+b.x, y+b.y, z+b.z};
     }
 
-    inline vec3 operator-(const vec3 b) const {
-        return vec3(x-b.x, y-b.y, z-b.z);
+    inline vec3 operator-(const vec3& b) const {
+        return {x-b.x, y-b.y, z-b.z};
     }
 
     inline vec3 operator*(const float s) const {
-        return vec3(x*s, y*s, z*s);
+        return {x*s, y*s, z*s};
     }
     inline vec3 operator/(const float s) const {
-        return vec3(x/s, y/s, z/s);
+        return {x/s, y/s, z/s};
     }
 
-    inline vec3 operator*(const vec3 b) const {
-        return vec3(x*b.x, y*b.y, z*b.z);
-    }
-
-    inline vec3& operator=(const vec3 b) {
-        x = b.x;
-        y = b.y;
-        z = b.z;
-        return *this;
+    inline vec3 operator*(const vec3& b) const {
+        return {x*b.x, y*b.y, z*b.z};
     }
 
     vec3(float x1, float y1, float z1) {
@@ -73,10 +66,10 @@ struct mat4x4
 
     inline vec3 operator*(const vec3& b) const{
         constexpr float b4 = 1;
-        return vec3(
+        return {
                 b.x*matrix[0]+b.y*matrix[1]+b.z*matrix[2]+b4*matrix[3],
                 b.x*matrix[4]+b.y*matrix[5]+b.z*matrix[6]+b4*matrix[7],
-                b.x*matrix[8]+b.y*matrix[9]+b.z*matrix[10]+b4*matrix[11]);
+                b.x*matrix[8]+b.y*matrix[9]+b.z*matrix[10]+b4*matrix[11]};
     }
 };
 
@@ -191,7 +184,7 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
         const vec3 direction, const float camera_x, const float camera_y, const float camera_z, const float far_clip,
         object_interface** objects, int objects_length, light** lights, int lights_length)
 {
-    const vec3 ambient_color = vec3(0.2,0.2,0.2);
+    const vec3 ambient_color = vec3(1,1,1);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
     vec3 position = vec3(camera_x,camera_y,camera_z);
@@ -326,7 +319,7 @@ vec3 phong_contrib_for_light(vec3 diffuse_color, vec3 specular_color, float alph
     float dot_r_c = dot(reflection_direction, camera_object_direction);
 
     if(dot_o_n < 0){
-        return vec3(0, 0, 0);
+        return {0, 0, 0};
     }
 
     if(dot_r_c < 0){
@@ -389,8 +382,9 @@ vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_co
                                                 objects, objects_length);
     }
 
-    return vec3(clamp(color.x,0.,1.),clamp(color.y,0.,1.),
-            clamp(color.z,0.,1.));
+    return {clamp(color.x,0.f,1.f),
+            clamp(color.y,0.f,1.f),
+            clamp(color.z,0.f,1.f)};
 }
 
 
