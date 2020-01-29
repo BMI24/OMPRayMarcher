@@ -137,19 +137,19 @@ inline void write_r(uint8_t* image, int image_x, int image_y, int x_size, uint8_
 inline void write_g(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline void write_b(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
-        vec3 direction, float camera_x, float camera_y, float camera_z, float far_clip,
+        vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
         object_interface** objects, int objects_length, light** lights, int lights_length);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
-float scene_sdf(object_interface *const *objects, int objects_length, vec3 position, int &nearest_object);
-vec3 estimate_normal(object_interface *const *objects, int objects_length, vec3 position);
-vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
-                        vec3 camera_position, object_interface *const *objects, int objects_length,
-                        int hit_object_index, light *const *lights, int lights_length);
-vec3 normalize(vec3 input);
+float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object);
+vec3 estimate_normal(object_interface *const *objects, int objects_length, const vec3& position);
+vec3 phong_illumination(const vec3& ambient_color, const vec3& diffuse_color, const vec3& specular_color, float alpha,
+        const vec3& position, const vec3& camera_position, object_interface *const *objects, int objects_length,
+        int hit_object_index, light *const *lights, int lights_length);
+vec3 normalize(const vec3& input);
 
 //very small number
-constexpr float epsilon = 0.0001;
+constexpr float epsilon = 0.001;
 
 void render(const int image_x_size, const int image_y_size, uint8_t* image, object_interface** objects,
         int objects_length, light** lights, int lights_length, float camera_x_pos, float camera_y_pos,
@@ -180,9 +180,9 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, obje
     }
 }
 
-void render_pixel(uint8_t* image, const int image_x, const int image_y, const int x_size,
-        const vec3 direction, const float camera_x, const float camera_y, const float camera_z, const float far_clip,
-        object_interface** objects, int objects_length, light** lights, int lights_length)
+void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
+                  vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
+                  object_interface** objects, int objects_length, light** lights, int lights_length)
 {
     const vec3 ambient_color = vec3(1,1,1);
     const vec3 diffuse_color = vec3(.4,.4,.4);
@@ -223,12 +223,12 @@ void render_pixel(uint8_t* image, const int image_x, const int image_y, const in
     }
 }
 
-float length(const vec3 input)
+float length(const vec3& input)
 {
     return sqrtf(powf(input.x,2)+powf(input.y,2)+powf(input.z,2));
 }
 
-vec3 normalize(vec3 input)
+vec3 normalize(const vec3& input)
 {
     float input_length = length(input);
     return input/input_length;
@@ -261,7 +261,7 @@ inline float deg2rad(float degrees) {
     return degrees * pi_on_180;
 }
 
-float scene_sdf(object_interface *const *objects, int objects_length, vec3 position, int &nearest_object) {
+float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object) {
     float smallest_distance = FLT_MAX;
     for (int i = 0; i < objects_length; ++i) {
         float distance = objects[i]->distance_to_surface(position.x,position.y,position.z);
@@ -274,23 +274,23 @@ float scene_sdf(object_interface *const *objects, int objects_length, vec3 posit
     return smallest_distance;
 }
 
-vec3 estimate_normal(object_interface *const *objects, int objects_length, vec3 position) {
-    int throwaway;
+vec3 estimate_normal(object_interface *const *objects, int objects_length, const vec3& position) {
+    int discard;
     return normalize(vec3(
-            scene_sdf(objects,objects_length,vec3(position.x + epsilon, position.y, position.z), throwaway)
-            - scene_sdf(objects,objects_length,vec3(position.x - epsilon, position.y, position.z), throwaway),
-            scene_sdf(objects,objects_length,vec3(position.x, position.y + epsilon, position.z), throwaway)
-            - scene_sdf(objects,objects_length,vec3(position.x, position.y - epsilon, position.z), throwaway),
-            scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z  + epsilon), throwaway)
-            - scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z - epsilon), throwaway)
+            scene_sdf(objects,objects_length,vec3(position.x + epsilon, position.y, position.z), discard)
+            - scene_sdf(objects,objects_length,vec3(position.x - epsilon, position.y, position.z), discard),
+            scene_sdf(objects,objects_length,vec3(position.x, position.y + epsilon, position.z), discard)
+            - scene_sdf(objects,objects_length,vec3(position.x, position.y - epsilon, position.z), discard),
+            scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z  + epsilon), discard)
+            - scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z - epsilon), discard)
     ));
 }
 
-float dot(vec3 a, vec3 b){
+float dot(const vec3& a, const vec3& b){
     return a.x*b.x + a.y*b.y + a.z*b.z;
 }
 
-vec3 reflect(vec3 i, vec3 n){
+vec3 reflect(const vec3& i, const vec3& n){
     return i - n * 2.0 * dot(n, i);
 }
 
@@ -314,7 +314,8 @@ vec3 phong_contrib_for_light(vec3 diffuse_color, vec3 specular_color, float alph
     vec3 normal = estimate_normal(objects, objects_length, position);
     vec3 object_light_direction = normalize(light_pos - position);
     vec3 camera_object_direction = normalize(camera_position - position);
-    vec3 reflection_direction = normalize(reflect(object_light_direction * -1, normal));
+    vec3 opposite_light_direction = object_light_direction * -1.f;
+    vec3 reflection_direction = normalize(reflect(opposite_light_direction, normal));
     float dot_o_n = clamp(dot(object_light_direction, normal), 0, 1);
     float dot_r_c = dot(reflection_direction, camera_object_direction);
 
@@ -329,7 +330,7 @@ vec3 phong_contrib_for_light(vec3 diffuse_color, vec3 specular_color, float alph
     return light_intensity * (diffuse_color * dot_o_n + specular_color * powf(dot_r_c, alpha));
 }
 
-float scene_sdf_ignore(object_interface *const *objects, int objects_length, vec3 position, int ignore_object_index)
+float scene_sdf_ignore(object_interface *const *objects, int objects_length, const vec3& position, int ignore_object_index)
 {
     float smallest_distance = FLT_MAX;
     for (int i = 0; i < objects_length; ++i) {
@@ -344,8 +345,8 @@ float scene_sdf_ignore(object_interface *const *objects, int objects_length, vec
     return smallest_distance;
 }
 
-bool light_visible(object_interface *const *objects, int objects_length, const vec3 light_position,
-        const vec3 start_position, int ignore_object_index)
+bool light_visible(object_interface *const *objects, int objects_length, const vec3& light_position,
+        const vec3& start_position, int ignore_object_index)
 {
     vec3 position = start_position;
     vec3 direction = light_position-position;
@@ -366,8 +367,8 @@ bool light_visible(object_interface *const *objects, int objects_length, const v
     return smallest_distance > dist_to_light;
 }
 
-vec3 phong_illumination(vec3 ambient_color, vec3 diffuse_color, vec3 specular_color, float alpha, vec3 position,
-                        vec3 camera_position, object_interface *const *objects, int objects_length,
+vec3 phong_illumination(const vec3& ambient_color, const vec3& diffuse_color, const vec3& specular_color, float alpha,
+                        const vec3& position, const vec3& camera_position, object_interface *const *objects, int objects_length,
                         int hit_object_index, light *const *lights, int lights_length) {
     const vec3 ambient_light = vec3(1, 1, 1) * 0.5f;
     vec3 color = ambient_light * ambient_color;
