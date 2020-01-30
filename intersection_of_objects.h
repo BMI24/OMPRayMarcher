@@ -11,11 +11,7 @@ private:
 public:
     float distance_to_surface(float x2, float y2, float z2) override;
 
-    uint8_t get_color_r() override;
-
-    uint8_t get_color_g() override;
-
-    uint8_t get_color_b() override;
+    uint32_t get_color(float x2, float y2, float z2) override;
 
     intersection_of_objects(object_interface *object_one, object_interface *object_two);
 };

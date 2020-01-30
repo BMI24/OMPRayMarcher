@@ -37,7 +37,7 @@ inline uint32_t lerp (uint32_t a, uint32_t b, float ratio)
 }
 
 uint32_t box::get_color(float, float y2, float) {
-    return lerp(0u, color, fabsf(y2-y)/y_length);
+    return color;
 }
 
 box::box(float x, float y, float z, float x_length, float y_length, float z_length, uint32_t color){

@@ -190,9 +190,10 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
                   vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
                   object_interface** objects, int objects_length, light** lights, int lights_length)
 {
-    const vec3 ambient_color = vec3(1,1,1);
+    const vec3 ambient_color = vec3(0.2,0.2,0.2);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
+
     vec3 position = vec3(camera_x,camera_y,camera_z);
 
     int nearest_object;
