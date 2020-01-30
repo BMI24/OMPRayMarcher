@@ -152,6 +152,7 @@ vec3 phong_illumination(const vec3& ambient_color, const vec3& diffuse_color, co
         const vec3& position, const vec3& camera_position, object_interface *const *objects, int objects_length,
         int hit_object_index, light *const *lights, int lights_length);
 vec3 normalize(const vec3& input);
+float scene_sdf_optimized(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object, float* known_distances);
 
 //very small number
 constexpr float epsilon = 0.001;
@@ -195,16 +196,18 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
     const vec3 specular_color = vec3(.4,.4,.4);
 
     vec3 position = vec3(camera_x,camera_y,camera_z);
+    float known_distances[objects_length];
 
     int nearest_object;
-    float smallest_distance = scene_sdf(objects, objects_length, position, nearest_object);
+    float smallest_distance = scene_sdf_optimized(objects, objects_length, position, nearest_object, known_distances);
 
     while (smallest_distance > epsilon && distance_between(camera_x, camera_y, camera_z, position.x, position.y, position.z) < far_clip)
     {
         position = position + direction * smallest_distance;
 
-        smallest_distance = scene_sdf(objects, objects_length, position, nearest_object);
+        smallest_distance = scene_sdf_optimized(objects, objects_length, position, nearest_object, known_distances);
     }
+
 
     if (smallest_distance > epsilon)
     {
@@ -261,6 +264,29 @@ inline float distance_between(float x1, float y1, float z1, float x2, float y2, 
 inline float deg2rad(float degrees) {
     static const float pi_on_180 = 4.f * atanf(1.0) / 180.f;
     return degrees * pi_on_180;
+}
+
+float scene_sdf_optimized(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object, float* known_distances) {
+    float smallest_distance = FLT_MAX;
+    for (int i = 0; i < objects_length; ++i) {
+        float distance;
+        if (known_distances[i] <= epsilon) {
+            distance = objects[i]->distance_to_surface(position.x, position.y, position.z);
+            known_distances[i] = distance;
+        }
+        else {
+            distance = known_distances[i];
+        }
+
+        if(distance < smallest_distance){
+            smallest_distance = distance;
+            nearest_object = i;
+        }
+    }
+    for (int i = 0; i < objects_length; ++i) {
+        known_distances[i] -= smallest_distance;
+    }
+    return smallest_distance;
 }
 
 float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object) {
@@ -344,6 +370,7 @@ float light_visibility(object_interface *const *objects, int objects_length, con
     int discard;
     for(float curr_dist = start_dist; curr_dist < max_dist;)
     {
+        //TODO: if soft shadows are disabled, we could use scene_sdf_optimized here (nearly halfed my runtime)
         float min_dist = scene_sdf(objects, objects_length, start_position + (direction * curr_dist), discard);
         if (min_dist < epsilon)
             return 0.f;
