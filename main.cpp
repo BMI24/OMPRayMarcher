@@ -6,16 +6,50 @@
 #include "object_interface.hpp"
 #include "light.h"
 #include <chrono>
+#include "difference_of_objects.h"
+#include "union_of_objects.h"
+#include "intersection_of_objects.h"
 
 int main() {
     const std::string file_name = "raymarch.bmp";
-    constexpr int image_x_size = 500;
-    constexpr int image_y_size = 500;
-    sphere sphere_one(9, -5, 5, 2, 0xFF000000);
-    sphere sphere_two(6, 2, -1, 1.5, 0x00FF0000);
-    box box_one(7,-2,-3,1,2,2, 0x0000FF00);
-    box box_two(8,4,3,1,2.5,1.25, 0x6400FF00);
-    std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two};
+    constexpr int image_x_size = 1920;
+    constexpr int image_y_size = 1080;
+    sphere sphere_one(9, -4, -1, 2, 0XFF000000);
+    sphere sphere_two(6, 2, -1, 1.5, 0X00FF0000);
+    box box_one(7, -2, -8, 1, 2, 2, 0X0000FF00);
+    box box_two(8, 4, 3, 1, 2.5, 1.25, 0X6400FF00);
+
+    box box_three(6, 2.5, -6, 1, 2, 2, 0X00FF9600);
+    sphere sphere_three(4, 4, -7.5, 2, 0X00000000);
+    sphere sphere_four(4, 4, -4.5, 2, 0X00000000);
+    sphere sphere_five(4, 1, -7.5, 2, 0X00000000);
+    sphere sphere_six(4, 1, -4.5, 2, 0X00000000);
+    sphere sphere_seven(8, 4, -7.5, 2, 0X00000000);
+    sphere sphere_eight(8, 4, -4.5, 2, 0X00000000);
+    sphere sphere_nine(8, 1, -7.5, 2, 0X00000000);
+    sphere sphere_ten(8, 1, -4.5, 2, 0X00000000);
+    difference_of_objects box_sphere_one(&box_three, &sphere_three);
+    difference_of_objects box_sphere_two(&box_sphere_one, &sphere_four);
+    difference_of_objects box_sphere_three(&box_sphere_two, &sphere_five);
+    difference_of_objects box_sphere_four(&box_sphere_three, &sphere_six);
+    difference_of_objects box_sphere_five(&box_sphere_four, &sphere_seven);
+    difference_of_objects box_sphere_six(&box_sphere_five, &sphere_eight);
+    difference_of_objects box_sphere_seven(&box_sphere_six, &sphere_nine);
+    difference_of_objects box_sphere_eight(&box_sphere_seven, &sphere_ten);
+
+    sphere sphere_eleven(8, 4, 8, 2.5, 0XD2643200);
+    box box_four(8, 4, 8, 2, 2, 2, 0X00000000);
+    intersection_of_objects sphere_box_one(&sphere_eleven, &box_four);
+
+    box box_five(6, -2, 4, 2, 1, 1, 0X64963200);
+    box box_six(6, -2, 4, 1, 2, 1, 0X00000000);
+    box box_seven(6, -2, 4, 1, 1, 2, 0X00000000);
+    box box_eight(6, -2, 4, 1, 2, 1, 0X00000000);
+    union_of_objects box_box_one(&box_five, &box_six);
+    union_of_objects box_box_two(&box_box_one, &box_seven);
+    union_of_objects box_box_three(&box_box_two, &box_eight);
+    std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two,
+                                              &box_sphere_eight, &sphere_box_one, &box_box_three};
     light light_one(3, -3, 3, .7, .7, .7);
     light light_two(2, 10, -4, 0.9, 0.9, 0.9);
     std::vector<light*> lights = {&light_one, &light_two};

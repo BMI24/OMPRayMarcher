@@ -193,6 +193,7 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
     const vec3 ambient_color = vec3(.1,.1,.1);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
+
     vec3 position = vec3(camera_x,camera_y,camera_z);
 
     int nearest_object;
@@ -358,7 +359,7 @@ float light_visibility(object_interface *const *objects, int objects_length, con
 vec3 phong_illumination(const vec3& ambient_color, const vec3& diffuse_color, const vec3& specular_color, float alpha,
                         const vec3& position, const vec3& camera_position, object_interface *const *objects, int objects_length,
                         int, light *const *lights, int lights_length) {
-    const vec3 ambient_light = vec3(1, 1, 1) * 0.0f;
+    const vec3 ambient_light = vec3(1, 1, 1) * 0.5f;
     vec3 color = ambient_light * ambient_color;
 
     for (int i = 0; i < lights_length; ++i) {

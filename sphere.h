@@ -1,7 +1,3 @@
-//
-// Created by BMI24 on 23.01.2020.
-//
-
 #ifndef OMPRM_SPHERE_H
 #define OMPRM_SPHERE_H
 
