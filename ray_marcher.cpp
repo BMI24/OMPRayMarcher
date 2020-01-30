@@ -190,7 +190,7 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
                   vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
                   object_interface** objects, int objects_length, light** lights, int lights_length)
 {
-    const vec3 ambient_color = vec3(1,1,1);
+    const vec3 ambient_color = vec3(.1,.1,.1);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
     vec3 position = vec3(camera_x,camera_y,camera_z);
@@ -332,58 +332,45 @@ vec3 phong_contrib_for_light(const vec3& diffuse_color, const vec3& specular_col
     return light_intensity * (diffuse_color * dot_o_n + specular_color * powf(dot_r_c, alpha));
 }
 
-float scene_sdf_ignore(object_interface *const *objects, int objects_length, const vec3& position,
-        int ignore_object_index)
+float light_visibility(object_interface *const *objects, int objects_length, const vec3& light_position,
+        const vec3& start_position)
 {
-    float smallest_distance = FLT_MAX;
-    for (int i = 0; i < objects_length; ++i) {
-        if (i == ignore_object_index)
-            continue;
-        float distance = objects[i]->distance_to_surface(position.x,position.y,position.z);
-
-        if(distance < smallest_distance){
-            smallest_distance = distance;
-        }
-    }
-    return smallest_distance;
-}
-
-bool light_visible(object_interface *const *objects, int objects_length, const vec3& light_position,
-        const vec3& start_position, int ignore_object_index)
-{
-    vec3 position = start_position;
-    vec3 direction = light_position-position;
-    direction = normalize(direction);
-    float dist_to_light = (light_position-position).length();
-
-
-    float smallest_distance = scene_sdf_ignore(objects, objects_length, position, ignore_object_index);
-
-    while (smallest_distance > epsilon && smallest_distance < dist_to_light)
+    vec3 direction = normalize(light_position-start_position);
+    const float start_dist = epsilon * 10;
+    float visibility = 1.f;
+    float hardness = .8f;
+    float max_dist = (light_position-start_position).length();
+    int discard;
+    for(float curr_dist = start_dist; curr_dist < max_dist;)
     {
-        position = position + direction * smallest_distance;
+        float min_dist = scene_sdf(objects, objects_length, start_position + (direction * curr_dist), discard);
+        if (min_dist < epsilon)
+            return 0.f;
 
-        dist_to_light = (light_position-position).length();
-        smallest_distance = scene_sdf_ignore(objects, objects_length, position, ignore_object_index);
+        visibility = fminf(visibility, .5f + .5f * min_dist / (hardness * curr_dist));
+        if(visibility < epsilon)
+            return 0.f;
+        curr_dist += min_dist;
     }
-
-    return smallest_distance > dist_to_light;
+    return visibility * visibility * (3.f - 2.f * visibility); // smoothstep
 }
 
 vec3 phong_illumination(const vec3& ambient_color, const vec3& diffuse_color, const vec3& specular_color, float alpha,
                         const vec3& position, const vec3& camera_position, object_interface *const *objects, int objects_length,
-                        int hit_object_index, light *const *lights, int lights_length) {
-    const vec3 ambient_light = vec3(1, 1, 1) * 0.5f;
+                        int, light *const *lights, int lights_length) {
+    const vec3 ambient_light = vec3(1, 1, 1) * 0.0f;
     vec3 color = ambient_light * ambient_color;
 
     for (int i = 0; i < lights_length; ++i) {
-        if (!light_visible(objects,objects_length, vec3(lights[i]->x, lights[i]->y, lights[i]->z), position,
-                hit_object_index))
+        float visibility = light_visibility(objects,objects_length,
+                vec3(lights[i]->x, lights[i]->y, lights[i]->z), position);
+        if (visibility < epsilon)
             continue;
         color = color + phong_contrib_for_light(diffuse_color, specular_color, alpha, position, camera_position,
                                                 vec3(lights[i]->x, lights[i]->y, lights[i]->z),
                                                 vec3(lights[i]->r, lights[i]->g, lights[i]->b),
-                                                objects, objects_length);
+                                                objects, objects_length)
+                                                        * visibility;
     }
 
     return {clamp(color.x,0.f,1.f),
