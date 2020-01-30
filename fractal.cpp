@@ -35,12 +35,11 @@ struct vec3
         y = y1;
         z = z1;
     }
-};
 
-inline float length(const vec3& input)
-{
-    return sqrtf(powf(input.x,2.f)+powf(input.y,2.f)+powf(input.z,2.f));
-}
+    inline float length() const {
+        return sqrtf(powf(x,2.f)+powf(y,2.f)+powf(z,2.f));
+    }
+};
 
 fractal::fractal(float x, float y, float z, int iter, float scale, uint32_t color)
 {
@@ -64,22 +63,22 @@ float fractal::distance_to_surface(float px, float py, float pz) {
     for (int i = 0; i < iter; ++i) {
         //find nearest vertex
         nearest_vert = vert1;
-        smallest_dist = length(p - vert1);
+        smallest_dist = (p - vert1).length();
 
-        local_dist = length(p - vert2);
+        local_dist = (p - vert2).length();
         if (local_dist < smallest_dist)
         {
             nearest_vert = vert2;
             smallest_dist=local_dist;
         }
-        local_dist = length(p - vert3);
+        local_dist = (p - vert3).length();
 
         if (local_dist < smallest_dist)
         {
             nearest_vert = vert3;
             smallest_dist=local_dist;
         }
-        local_dist = length(p - vert4);
+        local_dist = (p - vert4).length();
 
         if (local_dist < smallest_dist)
         {
@@ -89,7 +88,7 @@ float fractal::distance_to_surface(float px, float py, float pz) {
         p = p * scale - nearest_vert * (scale - 1.f);
     }
 
-    return length(p) * powf(scale, float(-iter));
+    return p.length() * powf(scale, float(-iter));
 }
 
 uint32_t fractal::get_color(float, float, float)  {

@@ -35,6 +35,11 @@ struct vec3
         y = y1;
         z = z1;
     }
+
+    inline float length() const
+    {
+        return sqrtf(powf(x,2)+powf(y,2)+powf(z,2));
+    }
 };
 
 struct mat4x4
@@ -224,14 +229,9 @@ void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
     }
 }
 
-float length(const vec3& input)
-{
-    return sqrtf(powf(input.x,2)+powf(input.y,2)+powf(input.z,2));
-}
-
 vec3 normalize(const vec3& input)
 {
-    float input_length = length(input);
+    float input_length = input.length();
     return input/input_length;
 }
 
@@ -354,7 +354,7 @@ bool light_visible(object_interface *const *objects, int objects_length, const v
     vec3 position = start_position;
     vec3 direction = light_position-position;
     direction = normalize(direction);
-    float dist_to_light = length(light_position-position);
+    float dist_to_light = (light_position-position).length();
 
 
     float smallest_distance = scene_sdf_ignore(objects, objects_length, position, ignore_object_index);
@@ -363,7 +363,7 @@ bool light_visible(object_interface *const *objects, int objects_length, const v
     {
         position = position + direction * smallest_distance;
 
-        dist_to_light = length(light_position-position);
+        dist_to_light = (light_position-position).length();
         smallest_distance = scene_sdf_ignore(objects, objects_length, position, ignore_object_index);
     }
 
