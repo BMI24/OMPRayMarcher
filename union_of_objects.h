@@ -6,7 +6,6 @@
 class union_of_objects : public object_interface {
 private:
     object_interface *object_one, *object_two;
-    uint8_t color_r, color_g, color_b;
 
 public:
     float distance_to_surface(float x2, float y2, float z2) override;

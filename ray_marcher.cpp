@@ -38,7 +38,7 @@ struct vec3
 
     inline float length() const
     {
-        return sqrtf(powf(x,2)+powf(y,2)+powf(z,2));
+        return std::sqrt(x*x+y*y+z*z);
     }
 };
 
@@ -252,10 +252,10 @@ inline void write_b(uint8_t* image, const int image_x, const int image_y, const 
 }
 
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2) {
-    return sqrtf(
-            powf(x1 - x2, 2)
-            + powf(y1 - y2, 2)
-            + powf(z1 - z2, 2));
+    float xdiff = x1 - x2;
+    float ydiff = y1 - y2;
+    float zdiff = z1 - z2;
+    return std::sqrt(xdiff*xdiff+ydiff*ydiff+zdiff*zdiff);
 }
 
 inline float deg2rad(float degrees) {
@@ -296,8 +296,8 @@ vec3 reflect(const vec3& i, const vec3& n){
     return i - n * 2.0 * dot(n, i);
 }
 
-float clamp(float n, float lower, float upper){
-    return std::max(lower, std::min(n, upper));
+float clamp(float n, float lower, float upper) {
+    return std::fmax(lower, std::fmin(n, upper));
 }
 
 /**
@@ -330,7 +330,7 @@ vec3 phong_contrib_for_light(const vec3& diffuse_color, const vec3& specular_col
         return light_intensity * (diffuse_color * dot_o_n);
     }
 
-    return light_intensity * (diffuse_color * dot_o_n + specular_color * powf(dot_r_c, alpha));
+    return light_intensity * (diffuse_color * dot_o_n + specular_color * std::pow(dot_r_c, alpha));
 }
 
 float light_visibility(object_interface *const *objects, int objects_length, const vec3& light_position,
@@ -348,7 +348,7 @@ float light_visibility(object_interface *const *objects, int objects_length, con
         if (min_dist < epsilon)
             return 0.f;
 
-        visibility = fminf(visibility, .5f + .5f * min_dist / (hardness * curr_dist));
+        visibility = std::fmin(visibility, .5f + .5f * min_dist / (hardness * curr_dist));
         if(visibility < epsilon)
             return 0.f;
         curr_dist += min_dist;

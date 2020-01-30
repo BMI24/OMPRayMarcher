@@ -3,10 +3,10 @@
 #include "sphere.h"
 
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2) {
-    return sqrtf(
-            powf(x1 - x2, 2)
-            + powf(y1 - y2, 2)
-            + powf(z1 - z2, 2));
+    float xdiff = x1 - x2;
+    float ydiff = y1 - y2;
+    float zdiff = z1 - z2;
+    return std::sqrt(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
 }
 
 float sphere::distance_to_surface(float x2, float y2, float z2) {

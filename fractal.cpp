@@ -37,7 +37,7 @@ struct vec3
     }
 
     inline float length() const {
-        return sqrtf(powf(x,2.f)+powf(y,2.f)+powf(z,2.f));
+        return std::sqrt(x*x+y*y+z*z);
     }
 };
 
@@ -88,7 +88,7 @@ float fractal::distance_to_surface(float px, float py, float pz) {
         p = p * scale - nearest_vert * (scale - 1.f);
     }
 
-    return p.length() * powf(scale, float(-iter));
+    return p.length() * std::pow(scale, float(-iter));
 }
 
 uint32_t fractal::get_color(float, float, float)  {
