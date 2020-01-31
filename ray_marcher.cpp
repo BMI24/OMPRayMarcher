@@ -144,7 +144,7 @@ inline void write_g(uint8_t* image, int image_x, int image_y, int x_size, uint8_
 inline void write_b(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
         vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
-        object_interface** objects, int objects_length, light** lights, int lights_length);
+        object_interface** objects, int objects_length, light** lights, int lights_length, float* known_distances);
 inline float deg2rad (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object);
@@ -174,30 +174,36 @@ void render(const int image_x_size, const int image_y_size, uint8_t* image, obje
     float aspect_ratio = (float)image_x_size / (float) image_y_size;
     float fov_scale = tanf(deg2rad(fov * .5f));
     vec3 origin = camera_to_world * vec3(0,0,0);
-
-#pragma omp parallel for collapse(2)
-    for (int j = 0; j < image_y_size; ++j) {
-        for (int i = 0; i < image_x_size; ++i) {
-            float x = (2 * ((float)i+.5f)/ (float)image_x_size - 1.f) * aspect_ratio * fov_scale;
-            float y = (1 - 2 * ((float)j+.5f) / (float)image_y_size) * fov_scale;
-            vec3 dir = camera_to_world * vec3(x,y,-1) - origin;
-            dir = normalize(dir);
-            render_pixel(image, i, j, image_x_size, dir, camera_x_pos, camera_y_pos, camera_z_pos,
-                    far_clip, objects, objects_length, lights, lights_length);
+#pragma omp parallel
+    {
+        float known_distances[objects_length];
+#pragma omp for collapse(2)
+        for (int j = 0; j < image_y_size; ++j) {
+            for (int i = 0; i < image_x_size; ++i) {
+                float x = (2 * ((float) i + .5f) / (float) image_x_size - 1.f) * aspect_ratio * fov_scale;
+                float y = (1 - 2 * ((float) j + .5f) / (float) image_y_size) * fov_scale;
+                vec3 dir = camera_to_world * vec3(x, y, -1) - origin;
+                dir = normalize(dir);
+                render_pixel(image, i, j, image_x_size, dir, camera_x_pos, camera_y_pos, camera_z_pos,
+                             far_clip, objects, objects_length, lights, lights_length, known_distances);
+            }
         }
+
     }
 }
 
 void render_pixel(uint8_t* image, int image_x, int image_y, int x_size,
                   vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
-                  object_interface** objects, int objects_length, light** lights, int lights_length)
+                  object_interface** objects, int objects_length, light** lights, int lights_length, float* known_distances)
 {
     const vec3 ambient_color = vec3(.1,.1,.1);
     const vec3 diffuse_color = vec3(.4,.4,.4);
     const vec3 specular_color = vec3(.4,.4,.4);
+    for (int i = 0; i < objects_length; ++i) {
+        known_distances[i] = 0;
+    }
 
     vec3 position = vec3(camera_x,camera_y,camera_z);
-    float known_distances[objects_length];
 
     int nearest_object;
     float smallest_distance = scene_sdf_optimized(objects, objects_length, position, nearest_object, known_distances);
