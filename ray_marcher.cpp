@@ -3,6 +3,7 @@
 #include <cfloat>
 #include "object_interface.hpp"
 #include "light.h"
+#include <queue>
 
 
 struct vec3
@@ -287,6 +288,46 @@ float scene_sdf_optimized(object_interface *const *objects, int objects_length, 
         known_distances[i] -= smallest_distance;
     }
     return smallest_distance;
+}
+
+float scene_sdf_optimized_exact(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object, float* known_distances) {
+    struct distance_with_index
+    {
+        float distance;
+        int index;
+        distance_with_index(float distance, int index)
+        {
+            this->distance = distance;
+            this->index = index;
+        }
+    };
+
+    auto cmp = [](distance_with_index& left, distance_with_index& right) { return left.distance > right.distance; };
+    std::priority_queue<distance_with_index, std::vector<distance_with_index>, decltype(cmp)> pqueue(cmp);
+    for (int i = 0; i < objects_length; ++i) {
+        pqueue.push(distance_with_index(known_distances[i], i));
+    }
+
+    float min_distance;
+    bool new_min_distance_found;
+    do{
+        min_distance = pqueue.top().distance;
+        nearest_object = pqueue.top().index;
+        float new_min_distance = objects[nearest_object]->distance_to_surface(position.x, position.y, position.z);
+        if (std::abs(new_min_distance - min_distance) < 0.1f * epsilon)
+        {
+            new_min_distance_found = false;
+        }
+        else
+        {
+            known_distances[nearest_object] = new_min_distance;
+            pqueue.pop();
+            pqueue.push(distance_with_index(new_min_distance, nearest_object));
+            new_min_distance_found = true;
+        }
+    }
+    while (new_min_distance_found);
+    return min_distance;
 }
 
 float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object) {
