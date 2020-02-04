@@ -7,11 +7,18 @@
 
 #include <cmath>
 #include "object_interface.hpp"
+#include <immintrin.h>
 
 class box : public object_interface{
 private:
     float x, y, z, x_length, y_length, z_length;
     uint32_t color;
+    union aligned_data{
+        __m128 vec;
+        float arr[4];
+    };
+    aligned_data vars;
+    aligned_data lengths;
 public:
     float distance_to_surface(float x2, float y2, float z2) override;
 

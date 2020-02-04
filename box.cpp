@@ -1,18 +1,32 @@
 #include <cmath>
 #include "box.h"
 
-inline float length(float x1, float y1, float z1) {
-    return std::sqrt(x1 * x1 + y1 * y1 + z1 * z1);
-}
-
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "portability-simd-intrinsics"
+#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-member-init"
 float box::distance_to_surface(float x2, float y2, float z2) {
-    float x_distance = std::abs(x-x2) - x_length;
-    float y_distance = std::abs(y-y2) - y_length;
-    float z_distance = std::abs(z-z2) - z_length;
+    // SSE2 intrinsics used to implement vectorization
+    // --> guaranteed to compile on every 64 bit architecture (quite portable)
 
-    return std::fmin(std::fmax(x_distance, std::fmax(y_distance, z_distance)), 0.f)
-           + length(std::fmax(x_distance, 0.f), std::fmax(y_distance,0.f), std::fmax(z_distance,0.f));
+    auto diff = _mm_sub_ps(vars.vec, _mm_setr_ps(x2, y2, z2, 0.f));
+
+    // logical left --- right shift by one to compute abs
+    auto vtmp = _mm_slli_epi32((__m128i)diff, 1);
+    auto dists = (__m128)_mm_srli_epi32(vtmp, 1);
+
+    aligned_data zero_min;
+    dists = _mm_sub_ps(dists, lengths.vec);
+    auto zero_max =  _mm_max_ps(dists, _mm_set1_ps(0.f));
+    zero_min.vec =  _mm_min_ps(dists, _mm_set1_ps(0.f));
+
+    aligned_data dists_mult;
+    dists_mult.vec = _mm_mul_ps(zero_max, zero_max);
+
+    auto _length = sqrtf(dists_mult.arr[0] + dists_mult.arr[1] + dists_mult.arr[2]);
+
+    return std::fmax(zero_min.vec[0], std::fmax(zero_min.vec[1], zero_min.vec[2])) + _length;
 }
+#pragma clang diagnostic pop
 
 inline uint32_t lerp (uint32_t a, uint32_t b, float ratio)
 {
