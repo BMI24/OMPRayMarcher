@@ -44,12 +44,10 @@ int main() {
     box box_five(6, -2, 4, 2, 1, 1, 0X64963200);
     box box_six(6, -2, 4, 1, 2, 1, 0X00000000);
     box box_seven(6, -2, 4, 1, 1, 2, 0X00000000);
-    box box_eight(6, -2, 4, 1, 2, 1, 0X00000000);
     union_of_objects box_box_one(&box_five, &box_six);
     union_of_objects box_box_two(&box_box_one, &box_seven);
-    union_of_objects box_box_three(&box_box_two, &box_eight);
     std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two,
-                                              &box_sphere_eight, &sphere_box_one, &box_box_three};
+                                              &box_sphere_eight, &sphere_box_one, &box_box_two};
     light light_one(3, -3, 3, .7, .7, .7);
     light light_two(2, 10, -4, 0.9, 0.9, 0.9);
     std::vector<light*> lights = {&light_one, &light_two};
