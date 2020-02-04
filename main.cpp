@@ -60,7 +60,7 @@ int main() {
     std::vector<uint32_t> image(image_x_size * image_y_size,0);
     auto start = std::chrono::steady_clock::now();
         render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size(),
-                0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 20);
+                0x00000000, 0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 20);
     auto end = std::chrono::steady_clock::now();
     bitmap_image image_file(image_x_size, image_y_size);
 
