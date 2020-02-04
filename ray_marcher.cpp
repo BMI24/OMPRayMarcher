@@ -178,7 +178,7 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
 #pragma omp parallel
     {
         float known_distances[objects_length];
-#pragma omp for collapse(2)
+#pragma omp for collapse(2) schedule(dynamic, 128)
         for (int j = 0; j < image_y_size; ++j) {
             for (int i = 0; i < image_x_size; ++i) {
                 float x = (2 * ((float) i + .5f) / (float) image_x_size - 1.f) * aspect_ratio * fov_scale;
@@ -190,7 +190,6 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
                 image[j * image_x_size + i] = color;
             }
         }
-
     }
 }
 
