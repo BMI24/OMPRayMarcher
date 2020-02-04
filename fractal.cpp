@@ -39,6 +39,10 @@ struct vec3
     inline float length() const {
         return std::sqrt(x*x+y*y+z*z);
     }
+
+    inline float qlength() const {
+        return x*x + y*y + z*z;
+    }
 };
 
 fractal::fractal(float x, float y, float z, int iter, float scale, uint32_t color)
@@ -63,23 +67,23 @@ float fractal::distance_to_surface(float px, float py, float pz) {
     for (int i = 0; i < iter; ++i) {
         //find nearest vertex
         nearest_vert = vert1;
-        smallest_dist = (p - vert1).length();
+        smallest_dist = (p - vert1).qlength();
 
-        local_dist = (p - vert2).length();
+        local_dist = (p - vert2).qlength();
         if (local_dist < smallest_dist)
         {
             nearest_vert = vert2;
             smallest_dist=local_dist;
         }
-        local_dist = (p - vert3).length();
 
+        local_dist = (p - vert3).qlength();
         if (local_dist < smallest_dist)
         {
             nearest_vert = vert3;
             smallest_dist=local_dist;
         }
-        local_dist = (p - vert4).length();
 
+        local_dist = (p - vert4).qlength();
         if (local_dist < smallest_dist)
         {
             nearest_vert = vert4;
