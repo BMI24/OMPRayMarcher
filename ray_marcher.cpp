@@ -194,6 +194,16 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
     }
 }
 
+inline vec3 get_vec3_from_packed_color(uint32_t packed_color)
+{
+    return vec3(packed_color >> 24u, float((packed_color >> 16u)&0xffu), float((packed_color>>8u)&0xffu)) / 255.f;
+}
+
+inline uint32_t get_packed_color_from_vec3(const vec3& color_vec)
+{
+    return int(color_vec.x * 255u) << 24u | int(color_vec.y * 255u) << 16u | int(color_vec.z * 255u) << 8u; // NOLINT(hicpp-signed-bitwise)
+}
+
 int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
                      object_interface** objects, int objects_length, light** lights,
                      int lights_length, const vec3& ambient_color, float* known_distances)
@@ -201,8 +211,8 @@ int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float c
     for (int i = 0; i < objects_length; ++i) {
         known_distances[i] = 0;
     }
-    vec3 position = vec3(camera_x,camera_y,camera_z);
 
+    vec3 position = vec3(camera_x,camera_y,camera_z);
     int nearest_object;
     float smallest_distance = scene_sdf_optimized(objects, objects_length, position, nearest_object, known_distances);
 
@@ -224,11 +234,9 @@ int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float c
         vec3 light = phong_illumination(ambient_color, 5, position,
                 vec3(camera_x, camera_y, camera_z), objects, objects_length, lights, lights_length);
         uint32_t packed_color = objects[nearest_object]->get_color(position.x, position.y, position.z);
-        vec3 color = vec3(packed_color >> 24u, float((packed_color >> 16u)&0xffu), float((packed_color>>8u)&0xffu));
-        color = color / 255.f;
+        vec3 color = get_vec3_from_packed_color(packed_color);
         vec3 lit_color = color * light;
-
-        return int(lit_color.x * 255u) << 24u | int(lit_color.y * 255u) << 16u | int(lit_color.z * 255u) << 8u; // NOLINT(hicpp-signed-bitwise)
+        return get_packed_color_from_vec3(lit_color);
     }
 }
 
