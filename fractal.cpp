@@ -5,47 +5,8 @@
 #include "fractal.h"
 #include <cmath>
 
-struct vec3
-{
-    float x;
-    float y;
-    float z;
 
-    inline vec3 operator+(const vec3& b) const {
-        return {x+b.x, y+b.y, z+b.z};
-    }
-
-    inline vec3 operator-(const vec3& b) const {
-        return {x-b.x, y-b.y, z-b.z};
-    }
-
-    inline vec3 operator*(const float s) const {
-        return {x*s, y*s, z*s};
-    }
-    inline vec3 operator/(const float s) const {
-        return {x/s, y/s, z/s};
-    }
-
-    inline vec3 operator*(const vec3& b) const {
-        return {x*b.x, y*b.y, z*b.z};
-    }
-
-    vec3(float x1, float y1, float z1) {
-        x = x1;
-        y = y1;
-        z = z1;
-    }
-
-    inline float length() const {
-        return std::sqrt(x*x+y*y+z*z);
-    }
-
-    inline float qlength() const {
-        return x*x + y*y + z*z;
-    }
-};
-
-fractal::fractal(float x, float y, float z, int iter, float scale, uint32_t color)
+fractal::fractal(float x, float y, float z, int iter, float scale, uint32_t color, float rotation)
 {
     fractal::x = x;
     fractal::y = y;
@@ -53,43 +14,56 @@ fractal::fractal(float x, float y, float z, int iter, float scale, uint32_t colo
     fractal::iter = iter;
     fractal::scale = scale;
     fractal::color = color;
+    float sinrotation=std::sin(rotation * 0.5f);
+    float cosrotation=std::cos(rotation * 0.5f);
+    mat3x3 rotMatrix = mat3x3(
+            cosrotation, -sinrotation, 0.0f,
+            sinrotation, cosrotation, 0.0f,
+            0.0f, 0.0f, 1.0f
+    );
+
+    mat3x3 rotMatrix2 = mat3x3(
+            cosrotation, 0.0f, -sinrotation,
+            0.0f, 1.0f, 0.0f,
+            sinrotation, 0.0f, cosrotation
+    );
+
+    vert1 = rotMatrix * rotMatrix2 * vec3(1.0f, 1.0f, 1.0f);
+    vert2 = rotMatrix * rotMatrix2 * vec3(-1.0f, 1.0f, -1.0f);
+    vert3 = rotMatrix * rotMatrix2 * vec3(1.0f, -1.0f, -1.0f);
+    vert4 = rotMatrix * rotMatrix2 * vec3(-1.0f, -1.0f, 1.0f);
 }
 
 float fractal::distance_to_surface(float px, float py, float pz) {
     vec3 p(px - x, py - y, pz - z);
-    vec3 vert1 = vec3(1, 1, 1);
-    vec3 vert2 = vec3(-1, -1, 1);
-    vec3 vert3 = vec3(1, -1, -1);
-    vec3 vert4 = vec3(-1, 1, -1);
-    vec3 nearest_vert(0, 0, 0);
-
     float smallest_dist, local_dist;
+    vec3* nearest_vert;
     for (int i = 0; i < iter; ++i) {
         //find nearest vertex
-        nearest_vert = vert1;
+        nearest_vert = &vert1;
         smallest_dist = (p - vert1).qlength();
 
         local_dist = (p - vert2).qlength();
         if (local_dist < smallest_dist)
         {
-            nearest_vert = vert2;
+            nearest_vert = &vert2;
             smallest_dist=local_dist;
         }
 
         local_dist = (p - vert3).qlength();
         if (local_dist < smallest_dist)
         {
-            nearest_vert = vert3;
+            nearest_vert = &vert3;
             smallest_dist=local_dist;
         }
 
         local_dist = (p - vert4).qlength();
         if (local_dist < smallest_dist)
         {
-            nearest_vert = vert4;
+            nearest_vert = &vert4;
         }
 
-        p = p * scale - nearest_vert * (scale - 1.f);
+        p = p * scale - *nearest_vert * (scale - 1.f);
     }
 
     return p.length() * std::pow(scale, float(-iter));
