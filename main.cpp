@@ -57,7 +57,7 @@ int main() {
     //y nach oben(+)/unten(-)
     //z nach links(-)/rechts(+)
 
-    std::vector<uint8_t> image(image_x_size * image_y_size * 3,0);
+    std::vector<uint32_t> image(image_x_size * image_y_size,0);
     auto start = std::chrono::steady_clock::now();
         render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size(),
                 0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 20);
@@ -67,9 +67,9 @@ int main() {
     for (int y = 0; y < image_y_size; ++y) {
         for (int x = 0; x < image_x_size; ++x) {
             image_file.set_pixel(x,y,
-                    image[3*(y*image_x_size+x)+0],
-                    image[3*(y*image_x_size+x)+1],
-                    image[3*(y*image_x_size+x)+2]);
+                    image[y*image_x_size+x] >> 24u,
+                    image[y*image_x_size+x] >> 16u & 0xFFu,
+                    image[y*image_x_size+x] >> 8u & 0xFFu);
         }
     }
 
