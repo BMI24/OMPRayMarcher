@@ -52,11 +52,7 @@ uint32_t box::get_color(float, float, float) {
 }
 
 box::box(float x, float y, float z, float x_length, float y_length, float z_length, uint32_t color){
-    this->x = x;
-    this->y = y;
-    this->z = z;
-    this->x_length = x_length;
-    this->y_length = y_length;
-    this->z_length = z_length;
+    vars.vec = _mm_setr_ps(x, y, z, 0.f);
+    lengths.vec = _mm_setr_ps(x_length, y_length, z_length, 0.f);
     this->color = color;
 }
