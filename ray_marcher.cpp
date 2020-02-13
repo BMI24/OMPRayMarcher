@@ -147,12 +147,9 @@ mat4x4 generate_mat_rot_z(float angle)
     return rot_mat;
 }
 
-inline void write_r(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
-inline void write_g(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
-inline void write_b(uint8_t* image, int image_x, int image_y, int x_size, uint8_t value);
 inline int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
-                            object_interface** objects, int objects_length, light** lights, int lights_length,
-                            const vec3& ambient_light, float* known_distances);
+                               object_interface** objects, int objects_length, light** lights,
+                               int lights_length, const vec3& ambient_color, float* known_distances);
 inline float degrees_to_radians (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object);
