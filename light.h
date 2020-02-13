@@ -1,7 +1,3 @@
-//
-// Created by BMI24 on 27.01.2020.
-//
-
 #ifndef OMPRM_LIGHT_H
 #define OMPRM_LIGHT_H
 
