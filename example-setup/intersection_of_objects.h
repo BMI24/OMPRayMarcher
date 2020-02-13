@@ -1,7 +1,7 @@
 #ifndef OMPRM_INTERSECTION_OF_OBJECTS_H
 #define OMPRM_INTERSECTION_OF_OBJECTS_H
 
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 
 class intersection_of_objects : public object_interface {
 private:

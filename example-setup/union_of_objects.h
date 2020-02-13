@@ -1,7 +1,7 @@
 #ifndef OMPRM_UNION_OF_OBJECTS_H
 #define OMPRM_UNION_OF_OBJECTS_H
 
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 
 class union_of_objects : public object_interface {
 private:

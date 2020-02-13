@@ -1,5 +1,5 @@
 #include "difference_of_objects.h"
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 #include <cmath>
 
 float difference_of_objects::distance_to_surface(float x2, float y2, float z2){

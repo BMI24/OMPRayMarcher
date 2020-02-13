@@ -1,7 +1,7 @@
 #ifndef OMPRM_DIFFERENCE_OF_OBJECTS_H
 #define OMPRM_DIFFERENCE_OF_OBJECTS_H
 
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 
 class difference_of_objects : public object_interface {
 private:

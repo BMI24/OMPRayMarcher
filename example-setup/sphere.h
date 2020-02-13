@@ -2,7 +2,7 @@
 #define OMPRM_SPHERE_H
 
 #include <cstdint>
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 
 class sphere : public object_interface {
 private:

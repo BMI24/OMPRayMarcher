@@ -6,7 +6,7 @@
 #define OMPRM_FRACTAL_H
 
 
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 #include <cmath>
 
 struct vec3
