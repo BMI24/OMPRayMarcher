@@ -37,9 +37,17 @@ struct vec3
         z = z1;
     }
 
-    inline float length() const
-    {
+    inline float length() const {
         return std::sqrt(x*x+y*y+z*z);
+    }
+
+    inline float dot(const vec3& b) const {
+        return x*b.x + y*b.y + z*b.z;
+    }
+
+    vec3 normalize() const {
+        float input_length = length();
+        return *this/input_length;
     }
 };
 
@@ -145,13 +153,12 @@ inline void write_b(uint8_t* image, int image_x, int image_y, int x_size, uint8_
 inline int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float camera_z, float far_clip,
                             object_interface** objects, int objects_length, light** lights, int lights_length,
                             const vec3& ambient_light, float* known_distances);
-inline float deg2rad (float degrees);
+inline float degrees_to_radians (float degrees);
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2);
 float scene_sdf(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object);
 vec3 estimate_normal(object_interface *const *objects, int objects_length, const vec3& position);
 vec3 phong_illumination(const vec3& ambient_color, float alpha, const vec3& position, const vec3& camera_position,
         object_interface *const *objects, int objects_length,light *const *lights, int lights_length);
-vec3 normalize(const vec3& input);
 float scene_sdf_optimized(object_interface *const *objects, int objects_length, const vec3& position, int &nearest_object, float* known_distances);
 
 //very small number
@@ -162,9 +169,9 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
         float camera_y_pos, float camera_z_pos, float rot_x, float rot_y, float rot_z, float scale_x, float scale_y,
         float scale_z, float fov, float far_clip)
 {
-    rot_x = deg2rad(rot_x);
-    rot_y = deg2rad(rot_y);
-    rot_z = deg2rad(rot_z);
+    rot_x = degrees_to_radians(rot_x);
+    rot_y = degrees_to_radians(rot_y);
+    rot_z = degrees_to_radians(rot_z);
     vec3 ambient_light(ambient_color >> 24u, float((ambient_color >> 16u)&0xffu), float((ambient_color>>8u)&0xffu));
     ambient_light = ambient_light / 255;
 
@@ -173,7 +180,7 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
             generate_mat_rot_x(rot_x) * generate_mat_rot_y(rot_y) * generate_mat_rot_z(rot_z);
 
     float aspect_ratio = (float)image_x_size / (float) image_y_size;
-    float fov_scale = tanf(deg2rad(fov * .5f));
+    float fov_scale = tanf(degrees_to_radians(fov * .5f));
     vec3 origin = camera_to_world * vec3(0,0,0);
 #pragma omp parallel
     {
@@ -184,7 +191,7 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
                 float x = (2 * ((float) i + .5f) / (float) image_x_size - 1.f) * aspect_ratio * fov_scale;
                 float y = (1 - 2 * ((float) j + .5f) / (float) image_y_size) * fov_scale;
                 vec3 dir = camera_to_world * vec3(x, y, -1) - origin;
-                dir = normalize(dir);
+                dir = dir.normalize();
                 uint32_t color = get_pixel_color(dir, camera_x_pos, camera_y_pos, camera_z_pos, far_clip,
                         objects, objects_length, lights, lights_length, ambient_light, known_distances);
                 image[j * image_x_size + i] = color;
@@ -239,12 +246,6 @@ int32_t get_pixel_color(vec3& direction, float camera_x, float camera_y, float c
     }
 }
 
-vec3 normalize(const vec3& input)
-{
-    float input_length = input.length();
-    return input/input_length;
-}
-
 inline float distance_between(float x1, float y1, float z1, float x2, float y2, float z2) {
     float xdiff = x1 - x2;
     float ydiff = y1 - y2;
@@ -252,7 +253,7 @@ inline float distance_between(float x1, float y1, float z1, float x2, float y2, 
     return std::sqrt(xdiff*xdiff+ydiff*ydiff+zdiff*zdiff);
 }
 
-inline float deg2rad(float degrees) {
+inline float degrees_to_radians(float degrees) {
     static const float pi_on_180 = 4.f * atanf(1.0) / 180.f;
     return degrees * pi_on_180;
 }
@@ -335,22 +336,18 @@ float scene_sdf(object_interface *const *objects, int objects_length, const vec3
 
 vec3 estimate_normal(object_interface *const *objects, int objects_length, const vec3& position) {
     int discard;
-    return normalize(vec3(
+    return vec3(
             scene_sdf(objects,objects_length,vec3(position.x + epsilon, position.y, position.z), discard)
             - scene_sdf(objects,objects_length,vec3(position.x - epsilon, position.y, position.z), discard),
             scene_sdf(objects,objects_length,vec3(position.x, position.y + epsilon, position.z), discard)
             - scene_sdf(objects,objects_length,vec3(position.x, position.y - epsilon, position.z), discard),
             scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z  + epsilon), discard)
             - scene_sdf(objects,objects_length,vec3(position.x, position.y, position.z - epsilon), discard)
-    ));
-}
-
-float dot(const vec3& a, const vec3& b){
-    return a.x*b.x + a.y*b.y + a.z*b.z;
+    ).normalize();
 }
 
 vec3 reflect(const vec3& i, const vec3& n){
-    return i - n * 2.0 * dot(n, i);
+    return i - n * 2.0 * n.dot(i);
 }
 
 float clamp(float n, float lower, float upper) {
@@ -371,12 +368,12 @@ float clamp(float n, float lower, float upper) {
 vec3 phong_contrib_for_light(float alpha, const vec3& position, const vec3& camera_position, const vec3& light_pos,
         const vec3& light_intensity, object_interface *const *objects, int objects_length){
     vec3 normal = estimate_normal(objects, objects_length, position);
-    vec3 object_light_direction = normalize(light_pos - position);
-    vec3 camera_object_direction = normalize(camera_position - position);
+    vec3 object_light_direction = (light_pos - position).normalize();
+    vec3 camera_object_direction = (camera_position - position).normalize();
     vec3 opposite_light_direction = object_light_direction * -1.f;
-    vec3 reflection_direction = normalize(reflect(opposite_light_direction, normal));
-    float dot_o_n = clamp(dot(object_light_direction, normal), 0, 1);
-    float dot_r_c = dot(reflection_direction, camera_object_direction);
+    vec3 reflection_direction = (reflect(opposite_light_direction, normal)).normalize();
+    float dot_o_n = clamp(object_light_direction.dot(normal), 0, 1);
+    float dot_r_c = reflection_direction.dot(camera_object_direction);
 
     if(dot_o_n < 0){
         return {0, 0, 0};
@@ -392,7 +389,7 @@ vec3 phong_contrib_for_light(float alpha, const vec3& position, const vec3& came
 float light_visibility(object_interface *const *objects, int objects_length, const vec3& light_position,
         const vec3& start_position)
 {
-    vec3 direction = normalize(light_position-start_position);
+    vec3 direction = (light_position-start_position).normalize();
     const float start_dist = epsilon * 10;
     float visibility = 1.f;
     float hardness = .8f;
