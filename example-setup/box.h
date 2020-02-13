@@ -2,7 +2,7 @@
 #define OMPRM_BOX_H
 
 #include <cmath>
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 #include <immintrin.h>
 
 class box : public object_interface{

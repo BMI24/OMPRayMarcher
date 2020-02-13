@@ -1,7 +1,3 @@
-//
-// Created by BMI24 on 28.01.2020.
-//
-
 #include "fractal.h"
 #include <cmath>
 

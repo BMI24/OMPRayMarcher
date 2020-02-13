@@ -1,7 +1,7 @@
 #ifndef OMPRM_INTERSECTION_OF_OBJECTS_H
 #define OMPRM_INTERSECTION_OF_OBJECTS_H
 
-#include "object_interface.hpp"
+#include "../object_interface.hpp"
 
 //uses intersection operation to create an object out of two objects in a scene
 class intersection_of_objects : public object_interface {

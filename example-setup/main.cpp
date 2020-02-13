@@ -1,10 +1,10 @@
 #include <iostream>
-#include "ray_marcher.h"
+#include "../ray_marcher.h"
 #include "bitmap_image.hpp"
 #include "sphere.h"
 #include "box.h"
-#include "object_interface.hpp"
-#include "light.h"
+#include "../object_interface.hpp"
+#include "../light.h"
 #include <chrono>
 #include "difference_of_objects.h"
 #include "union_of_objects.h"
