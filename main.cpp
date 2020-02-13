@@ -15,7 +15,12 @@ int main() {
     const std::string file_name = "raymarch.bmp";
     constexpr int image_x_size = 1920;
     constexpr int image_y_size = 1080;
-    sphere sphere_one(9, -4, -1, 2, 0XFF000000);
+
+    box box_eight(8, 0, 0, 25, 30, 30, 0Xc1c5c900);
+    box box_nine(8, 0, 0, 24.9, 29.9, 29.9, 0Xc1c5c900);
+    difference_of_objects room(&box_eight, &box_nine);
+
+    /*sphere sphere_one(9, -4, -1, 2, 0XFF000000);
     sphere sphere_two(6, 2, -1, 1.5, 0X00FF0000);
     box box_one(7, -2, -8, 1, 2, 2, 0X0000FF00);
     box box_two(8, 4, 3, 1, 2.5, 1.25, 0X6400FF00);
@@ -48,9 +53,21 @@ int main() {
     union_of_objects box_box_one(&box_five, &box_six);
     union_of_objects box_box_two(&box_box_one, &box_seven);
     std::vector<object_interface*> objects = {&box_one, &box_two, &sphere_one, &sphere_two,
-                                              &box_sphere_eight, &sphere_box_one, &box_box_two};
-    light light_one(3, -3, 3, .7, .7, .7);
-    light light_two(2, 10, -4, 0.9, 0.9, 0.9);
+                                              &box_sphere_eight, &sphere_box_one, &box_box_two};*/
+
+    sphere sphere_one(7, 3, -3, 2, 0XFF000000);
+    box box_one(8, -2, -2, 1, 2, 2, 0X0000FF00);
+
+    box box_five(6, 0, 5, 2, 1, 1, 0X64963200);
+    box box_six(6, 0, 5, 1, 2, 1, 0X00000000);
+    box box_seven(6, 0, 5, 1, 1, 2, 0X00000000);
+    union_of_objects box_box_one(&box_five, &box_six);
+    union_of_objects box_box_two(&box_box_one, &box_seven);
+    std::vector<object_interface*> objects = {&box_one, &sphere_one, &box_box_two, &room};
+
+    light light_one(-2, -3, 10, .2, .2, .2);
+    light light_two(0, 7, -7, .3, .3, .3);
+
     std::vector<light*> lights = {&light_one, &light_two};
     //x nach vorne(+)/hinten(-)
     //y nach oben(+)/unten(-)
@@ -59,7 +76,7 @@ int main() {
     std::vector<uint32_t> image(image_x_size * image_y_size,0);
     auto start = std::chrono::steady_clock::now();
     render(image_x_size, image_y_size, image.data(), objects.data(), objects.size(), lights.data(), lights.size(),
-           0x00000000, 0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 20);
+            0X00000000, 0, 0, 0, 0, -90, 0, 1, 1, 1, 90, 70);
     auto end = std::chrono::steady_clock::now();
 
     bitmap_image image_file(image_x_size, image_y_size);

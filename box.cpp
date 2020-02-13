@@ -28,6 +28,7 @@ float box::distance_to_surface(float x2, float y2, float z2) {
 }
 #pragma clang diagnostic pop
 
+//linear interpolation
 inline uint32_t lerp (uint32_t a, uint32_t b, float ratio)
 {
     uint8_t a_r = a >> 24u;

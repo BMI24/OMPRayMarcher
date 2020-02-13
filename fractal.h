@@ -99,7 +99,7 @@ struct mat3x3
     }
 };
 
-
+//fractal is a "recursion sierpinski tetrahedron"
 class fractal : public object_interface {
 private:
     int iter;

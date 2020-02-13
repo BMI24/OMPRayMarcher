@@ -393,9 +393,7 @@ float light_visibility(object_interface *const *objects, int objects_length, con
         const vec3& start_position)
 {
     vec3 direction = normalize(light_position-start_position);
-    const float start_dist = epsilon * 10;
-    float visibility = 1.f;
-    float hardness = .8f;
+    const float start_dist = epsilon * 100;
     float max_dist = (light_position-start_position).length();
     int discard;
     for(float curr_dist = start_dist; curr_dist < max_dist;)
@@ -405,12 +403,9 @@ float light_visibility(object_interface *const *objects, int objects_length, con
         if (min_dist < epsilon)
             return 0.f;
 
-        visibility = std::fmin(visibility, .5f + .5f * min_dist / (hardness * curr_dist));
-        if(visibility < epsilon)
-            return 0.f;
         curr_dist += min_dist;
     }
-    return visibility * visibility * (3.f - 2.f * visibility); // smoothstep
+    return 1.f; // smoothstep
 }
 
 vec3 phong_illumination(const vec3& ambient_color, float alpha, const vec3& position, const vec3& camera_position,

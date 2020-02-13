@@ -3,6 +3,7 @@
 
 #include "object_interface.hpp"
 
+//uses intersection operation to create an object out of two objects in a scene
 class intersection_of_objects : public object_interface {
 private:
     object_interface *object_one, *object_two;
