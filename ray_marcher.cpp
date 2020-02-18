@@ -89,14 +89,14 @@ struct mat4x4
 
 mat4x4 generate_mat_transl(float translation_x, float translation_y, float translation_z)
 {
-    mat4x4 scale_mat;
-    scale_mat.matrix[0] = 1;
-    scale_mat.matrix[3] = translation_x;
-    scale_mat.matrix[5] = 1;
-    scale_mat.matrix[7] = translation_y;
-    scale_mat.matrix[10] = 1;
-    scale_mat.matrix[11] = translation_z;
-    scale_mat.matrix[15] = 1;
+    mat4x4 transl_mat;
+    transl_mat.matrix[0] = 1;
+    transl_mat.matrix[3] = translation_x;
+    transl_mat.matrix[5] = 1;
+    transl_mat.matrix[7] = translation_y;
+    transl_mat.matrix[10] = 1;
+    transl_mat.matrix[11] = translation_z;
+    transl_mat.matrix[15] = 1;
 
     return transl_mat;
 }
