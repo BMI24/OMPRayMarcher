@@ -69,9 +69,9 @@ int main() {
     light light_two(0, 7, -7, .3, .3, .3);
 
     std::vector<light*> lights = {&light_one, &light_two};
-    //x nach vorne(+)/hinten(-)
-    //y nach oben(+)/unten(-)
-    //z nach links(-)/rechts(+)
+    //x front(+)/back(-)
+    //y up(+)/down(-)
+    //z left(-)/right(+)
 
     std::vector<uint32_t> image(image_x_size * image_y_size,0);
     auto start = std::chrono::steady_clock::now();
