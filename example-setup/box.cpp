@@ -32,14 +32,14 @@ float box::distance_to_surface(float x2, float y2, float z2) {
 inline uint32_t lerp (uint32_t a, uint32_t b, float ratio)
 {
     uint8_t a_r = a >> 24u;
-    uint8_t a_g = a >> 16u & 0xFFu;
-    uint8_t a_b = a >> 8u & 0xFFu;
-    uint8_t a_a = a & 0xFFu;
+    uint8_t a_g = a >> 16u;
+    uint8_t a_b = a >> 8u;
+    uint8_t a_a = a;
 
     uint8_t b_r = b >> 24u;
-    uint8_t b_g = b >> 16u & 0xFFu;
-    uint8_t b_b = b >> 8u & 0xFFu;
-    uint8_t b_a = b & 0xFFu;
+    uint8_t b_g = b >> 16u;
+    uint8_t b_b = b >> 8u;
+    uint8_t b_a = b;
 
     auto r_r = uint8_t(float(a_r) * (1.f-ratio) + float(b_r) * ratio);
     auto r_g = uint8_t(float(a_g) * (1.f-ratio) + float(b_g) * ratio);
