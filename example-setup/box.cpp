@@ -8,23 +8,24 @@ float box::distance_to_surface(float x2, float y2, float z2) {
     // SSE2 intrinsics used to implement vectorization
     // --> guaranteed to compile on every 64 bit architecture (quite portable)
 
-    auto diff = _mm_sub_ps(vars.vec, _mm_setr_ps(x2, y2, z2, 0.f));
+    auto diff = _mm_sub_ps(pos.vec, _mm_setr_ps(x2, y2, z2, 0.f));
 
     // logical left --- right shift by one to compute abs
     auto vtmp = _mm_slli_epi32((__m128i)diff, 1);
-    auto dists = (__m128)_mm_srli_epi32(vtmp, 1);
+    auto dists_to_surface = (__m128)_mm_srli_epi32(vtmp, 1);
 
-    aligned_data zero_min;
-    dists = _mm_sub_ps(dists, lengths.vec);
-    auto zero_max =  _mm_max_ps(dists, _mm_set1_ps(0.f));
-    zero_min.vec =  _mm_min_ps(dists, _mm_set1_ps(0.f));
+    aligned_data inner_dists_to_surface;
+    dists_to_surface = _mm_sub_ps(dists_to_surface, lengths.vec);
+    auto outer_dists_to_surface =  _mm_max_ps(dists_to_surface, _mm_set1_ps(0.f));
+    inner_dists_to_surface.vec =  _mm_min_ps(dists_to_surface, _mm_set1_ps(0.f));
 
     aligned_data dists_mult;
-    dists_mult.vec = _mm_mul_ps(zero_max, zero_max);
+    dists_mult.vec = _mm_mul_ps(outer_dists_to_surface, outer_dists_to_surface);
 
-    auto _length = sqrtf(dists_mult.arr[0] + dists_mult.arr[1] + dists_mult.arr[2]);
+    auto outer_dist = sqrtf(dists_mult.arr[0] + dists_mult.arr[1] + dists_mult.arr[2]);
 
-    return std::fmax(zero_min.vec[0], std::fmax(zero_min.vec[1], zero_min.vec[2])) + _length;
+    return std::fmax(inner_dists_to_surface.vec[0],std::fmax(inner_dists_to_surface.vec[1], inner_dists_to_surface.vec[2]))
+           + outer_dist;
 }
 #pragma clang diagnostic pop
 
@@ -53,7 +54,7 @@ uint32_t box::get_color(float, float, float) {
 }
 
 box::box(float x, float y, float z, float x_length, float y_length, float z_length, uint32_t color){
-    vars.vec = _mm_setr_ps(x, y, z, 0.f);
+    pos.vec = _mm_setr_ps(x, y, z, 0.f);
     lengths.vec = _mm_setr_ps(x_length, y_length, z_length, 0.f);
     this->color = color;
 }

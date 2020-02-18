@@ -11,7 +11,7 @@ private:
         __m128 vec;
         float arr[4];
     };
-    aligned_data vars;
+    aligned_data pos;
     aligned_data lengths;
     uint32_t color;
 public:
