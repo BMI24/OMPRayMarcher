@@ -98,7 +98,7 @@ mat4x4 generate_mat_transl(float translation_x, float translation_y, float trans
     scale_mat.matrix[11] = translation_z;
     scale_mat.matrix[15] = 1;
 
-    return scale_mat;
+    return transl_mat;
 }
 
 mat4x4 generate_mat_scale(float scale_x, float scale_y, float scale_z)
@@ -161,6 +161,8 @@ float scene_sdf_optimized(object_interface *const *objects, int objects_length, 
 //very small number
 constexpr float epsilon = 0.001;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "openmp-use-default-none"
 void render(const int image_x_size, const int image_y_size, uint32_t* image, object_interface** objects,
         int objects_length, light** lights, int lights_length, uint32_t ambient_color, float camera_x_pos,
         float camera_y_pos, float camera_z_pos, float rot_x, float rot_y, float rot_z, float scale_x, float scale_y,
@@ -196,6 +198,7 @@ void render(const int image_x_size, const int image_y_size, uint32_t* image, obj
         }
     }
 }
+#pragma clang diagnostic pop
 
 inline vec3 get_vec3_from_packed_color(uint32_t packed_color)
 {
